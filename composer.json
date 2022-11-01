@@ -1,0 +1,19 @@
+{
+    "name": "swg/composer",
+    "description": "swg common utility",
+    "type": "library",
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Swg\\Composer\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "周洪成",
+            "email": "zhouhc@jqlink.cn"
+        }
+    ]
+}
