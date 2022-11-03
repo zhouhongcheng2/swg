@@ -45,7 +45,7 @@ class Encrypt
      * @param int $length 加密盐长度
      * @return array
      */
-    public function createPassword(string $password,string $salt = '',int $length = 6)
+    public function createPassword(string $password,string $salt = '',int $length = 6) : array
     {
         // 密码字符集，可任意添加你需要的字符
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_ []{}<>~`+=,.;:/?|';

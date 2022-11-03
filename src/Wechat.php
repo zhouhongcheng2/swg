@@ -14,15 +14,14 @@ class Wechat
      * @route
      * @param string $app_id
      * @param string $app_secret
-     * @return false|mixed
+     * @return false|bool
      */
-    public function getAccessToken(string $app_id,string $app_secret)
+    public function getAccessToken()
     {
-        if (!$app_id || !$app_secret) return false;
-        $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' .$app_id . '&secret=' . $app_secret;
+        $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' .env("WECHAT.DR_APP_ID") . '&secret=' . env("WECHAT.DR_APP_SECRET");
         $token = Common::curlGet($url);
         if (empty($token)) return false;
-        return json_decode($token, true)['access_token'];
+        return json_decode($token, true);
     }
 
     /**
@@ -63,7 +62,7 @@ class Wechat
      * @param string $access_token
      * @param string $invite_code 邀请码
      * @param string $invite_path 默认是主页，页面 page，例如 pages/index/index，根路径前不要填加 /，不能携带参数（参数请放在 scene 字段里），如果不填写这个字段，默认跳主页面。
-     * @return false
+     * @return false|string 返回七牛云地址
      * @throws Exception
      */
     public function getWechatQrCode(string $access_token,string $invite_code,string $invite_path = 'pages/store/index')
