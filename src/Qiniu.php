@@ -27,7 +27,7 @@ class Qiniu
      * @return false|string
      * @throws Exception
      */
-    public function uploadQiniu(mixed $file_data, int $file_type = self::FILE_TYPE_LOCAL,string $file_suffix = 'png'): bool|string
+    public function uploadQiniu($file_data, int $file_type = self::FILE_TYPE_LOCAL,string $file_suffix = 'png')
     {
         // require_once 'sdk/qiniu/autoload.php';
         require_once root_path() .'vendor/swg/composer/sdk/qiniu/autoload.php';;
