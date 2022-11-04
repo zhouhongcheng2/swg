@@ -21,7 +21,7 @@ class WechatRobot
      * @param string $title 异常标题
      * @return bool
      */
-    public function sendWechatRobotMsg(array $exception_data,string $robot_url = self::ROBOT_DEPARTMENT,string $title = '异常警告') : bool
+    public function sendWechatRobotMsg(array $exception_data,string $title = '异常警告',string $robot_url = self::ROBOT_DEPARTMENT) : bool
     {
         if (!$exception_data) return false;
         $content = '';
