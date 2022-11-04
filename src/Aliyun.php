@@ -5,16 +5,39 @@ use Aliyun\Api\Sms\Request\V20170525\SendSmsRequest;
 use Aliyun\Core\Config;
 use Aliyun\Core\DefaultAcsClient;
 use Aliyun\Core\Profile\DefaultProfile;
+use Exception;
 
+/** 阿里云相关操作 */
 class Aliyun
 {
-    public function aliSendMsg($mobile, $tplCode, $tplParam, $signName, $accessKeyId, $accessKeySecret)
+    /** @var string 人头面 */
+    CONST ID_CARD_FACE = 'face';
+
+    /** @var string 国徽面 */
+    CONST ID_CARD_BACK = 'back';
+
+    /**
+     * 阿里云短信发送
+     * Author: zhouhongcheng
+     * datetime 2022/11/3 15:16
+     * @method
+     * @route
+     * @param string $mobile 手机号
+     * @param string $tplCode 短信模板
+     * @param array $templateParam 参数
+     * @return bool
+     */
+    public function aliSendMsg(string $mobile, string $tplCode, array $templateParam = []): bool
     {
+        $signName = env("ALIYUN.JK_SMS_SIGN_NAME");
+        $accessKeyId = env("ALIYUN.JK_SMS_ACCESS_KEY_ID");
+        $accessKeySecret = env("ALIYUN.JK_SMS_ACCESS_KEY_SECRET");
+
         if (empty($mobile) || empty($tplCode)) return false;
-        require_once 'sdk/aliyunsms/vendor/autoload.php';
+        // require_once 'sdk/aliyunsms/vendor/autoload.php';
+        require_once root_path() .'vendor/swg/composer/sdk/aliyunsms/vendor/autoload.php';
         Config::load();
         if (empty($accessKeyId) || empty($accessKeySecret)) return false;
-        $templateParam = $tplParam; //模板变量替换
         //短信模板ID
         $templateCode = $tplCode;
         //短信API产品名（短信产品名固定，无需修改）
@@ -48,4 +71,96 @@ class Aliyun
         if ($result['Message'] !== 'OK')  return false;
         return true;
     }
+
+    /**
+     * 身份证识别
+     * Author: lvg
+     * datetime 2022/11/3 15:44
+     * @method
+     * @route
+     * @param string $img_path 图片地址
+     * @param string $side  身份证正反
+     * @param bool $is_local 是否本地图片
+     * @return array
+     */
+    public function ocrIdCard(string $img_path,string $side = self::ID_CARD_FACE,  bool $is_local = true):array
+    {
+        try {
+            $url = "https://cardnumber.market.alicloudapi.com/rest/160601/ocr/ocr_idcard.json";
+            $appcode = env("ALIYUN.DR_OCR_ID_CARD_CODE");
+            // 请求头
+            $header = [
+                'Authorization:APPCODE ' . $appcode,
+                'Content-Type:application/json; charset=UTF-8',
+            ];
+            // 获取图片的base64
+            $image_data = Common::imageToBase64($img_path, $is_local);
+            if (!$image_data)  throw new Exception('图片转换失败');
+            // 请求数据
+            $data = [
+                'image' => $image_data,
+                'configure' => json_encode(['side' => $side])
+            ];
+            // 执行请求
+            $res = json_decode(Common::curlPost($url, json_encode($data), $header), true);
+            if ($res && is_array($res) && !empty($res['success'])) {
+                return [
+                    'code' => 1,
+                    'msg'  => 'OK',
+                    'data' => $res
+                ];
+            } else {
+                throw new Exception('识别失败');
+            }
+        } catch (Exception $exception) {
+            return [
+                'code' => 0,
+                'msg'  => $exception->getMessage(),
+                'data' => []
+            ];
+        }
+
+    }
+
+    /**
+     * 营业执照识别
+     * Author: lvg
+     * datetime 2022/11/3 15:50
+     * @method
+     * @route
+     * @param string $img_path 图片地址
+     * @param bool $is_local 是否本地图片
+     * @return array
+     */
+    public function ocrBusinessLicense(string $img_path, bool $is_local = true): array
+     {
+         try {
+             $url = 'https://bizlicense.market.alicloudapi.com/rest/160601/ocr/ocr_business_license.json';
+             $appcode = env("ALIYUN.DR_OCR_ID_CARD_CODE");
+             // 请求头
+             $header = [
+                 'Authorization:APPCODE ' . $appcode,
+                 'Content-Type:application/json; charset=UTF-8',
+             ];
+             // 图片转base64
+             $image_data = Common::imageToBase64($img_path, $is_local);
+             if (!$image_data)  throw new Exception('图片转换失败');
+             $res = json_decode(Common::curlPost($url, json_encode(['image' => $image_data]), $header), true);
+             if ($res && is_array($res) && !empty($res['success'])) {
+                 return [
+                     'code' => 1,
+                     'msg'  => 'Success',
+                     'data' => $res
+                 ];
+             } else {
+                 throw new Exception('识别失败');
+             }
+         } catch (Exception $exception) {
+             return [
+                 'code' => 0,
+                 'msg'  => $exception->getMessage(),
+                 'data' => []
+             ];
+         }
+     }
 }

@@ -30,7 +30,7 @@ class Qiniu
     public function uploadQiniu($file_data, int $file_type = self::FILE_TYPE_LOCAL,string $file_suffix = 'png')
     {
         // require_once 'sdk/qiniu/autoload.php';
-        require_once root_path() .'vendor/swg/composer/sdk/qiniu/autoload.php';;
+        require_once root_path() .'vendor/swg/composer/sdk/qiniu/autoload.php';
         // 构建鉴权对象
         $auth = new Auth(env("QINIU.ACCESS_KEY"), env("QINIU.SECRET_KEY"));
         // 生成上传 Token

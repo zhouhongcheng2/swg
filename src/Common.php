@@ -69,4 +69,31 @@ class Common
         curl_close($ch);
         return $file_contents;
     }
+
+    /**
+     * 图片转 base64
+     * Author: lvg
+     * datetime 2022/11/2 15:23
+     * @param string $image_path 文件路径
+     * @param bool $is_local 是否是本地文件
+     * @return false|string
+     */
+    public static function imageToBase64(string $image_path, bool $is_local = false)
+    {
+        if ($is_local) {
+            if (!file_exists($image_path)) {
+                return false;
+            }
+            if ($fp = fopen($image_path, "rb", 0)) {
+                $binary = fread($fp, filesize($image_path)); // 文件读取
+                fclose($fp);
+                $image_data = base64_encode($binary); // 转码
+            } else {
+                return false;
+            }
+        } else {
+            $image_data = file_get_contents($image_path);
+        }
+        return $image_data;
+    }
 }
