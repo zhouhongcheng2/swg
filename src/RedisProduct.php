@@ -11,10 +11,43 @@ class RedisProduct extends Redis
     /** @var string 商品列表key */
     CONST PRODUCT_LIST_KEY = 'product_list';
 
+    /** @var string 加盟商产品包 */
+    CONST PRODUCT_JM_PACKAGE_KEY = 'jm_package_key';
+
+
     public function __construct()
     {
         parent::__construct();
         $this->redis->select(self::REDIS_PRODUCT_DB);
+    }
+
+    /**
+     * 设置产品包
+     * Author: zhouhongcheng
+     * datetime 2022/11/5 14:34
+     * @method
+     * @route
+     * @param string $package_key 产品包键
+     * @param array $package_data 产品包data
+     * @return bool
+     */
+    public function setProductPackage(string $package_key = self::PRODUCT_JM_PACKAGE_KEY,array $package_data = [])
+    {
+        return $this->redis->set($package_key,json_encode($package_data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
+     * 获取产品包
+     * Author: zhouhongcheng
+     * datetime 2022/11/5 14:36
+     * @method
+     * @route
+     * @param string $package_key 产品包键
+     * @return mixed
+     */
+    public function getProductPackage(string $package_key = self::PRODUCT_JM_PACKAGE_KEY)
+    {
+        return json_decode($this->redis->get($package_key),true);
     }
 
     /**
