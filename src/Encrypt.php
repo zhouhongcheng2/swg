@@ -41,20 +41,26 @@ class Encrypt
      * @method
      * @route
      * @param string $password 用户传入的密码
-     * @param string $salt 加密盐
-     * @param int $length 加密盐长度
-     * @return array
+     * @param string $salt 盐
+     * @return string
      */
-    public function createPassword(string $password,string $salt = '',int $length = 6) : array
+    public function createPassword(string $password,string $salt = '') : string
     {
-        // 密码字符集，可任意添加你需要的字符
+        return md5($salt.$password.$salt);
+    }
+
+    /**
+     * 生成加密盐
+     * Author: zhouhongcheng
+     * datetime 2022/11/6 15:48
+     * @method
+     * @route
+     * @param int $length 长度
+     * @return string
+     */
+    public function createSalt(int $length = 6)
+    {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
-        if ($salt){
-            return [
-                'password'  =>  md5($salt.$password.$salt),
-                'salt'      =>  $salt
-            ];
-        }
         $salt = '';
         for ( $i = 0; $i < $length; $i++ )
         {
@@ -64,9 +70,6 @@ class Encrypt
             // $password .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
             $salt .= $chars[ mt_rand(0, strlen($chars) - 1) ];
         }
-        return [
-            'password'  =>  md5($salt.$password.$salt),
-            'salt'      =>  $salt
-        ];
+        return $salt;
     }
 }
