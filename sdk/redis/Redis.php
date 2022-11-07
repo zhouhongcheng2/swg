@@ -22,7 +22,7 @@ class Redis
         if ($this->redis == false){
             $robot = new WechatRobot();
             $robot->sendWechatRobotMsg([["title"=>"redis异常","remark"=>"redis链接异常请管理员及时核查"]],'Redis链接异常');
-            exit();
+            throw new Exception("Redis链接失败");
         }
     }
 }

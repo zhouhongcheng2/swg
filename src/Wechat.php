@@ -21,8 +21,6 @@ class Wechat
      * datetime 2022/11/2 16:40
      * @method
      * @route
-     * @param string $app_id
-     * @param string $app_secret
      * @return false|bool
      */
     public function getAccessToken()
@@ -44,13 +42,13 @@ class Wechat
      * @param string $app_secret
      * @return false|mixed
      */
-    public function getOpenIdByCode(string $code,string $app_id,string $app_secret)
+    public function getOpenIdByCode(string $code)
     {
         if (!$code) return false;
         $url = 'https://api.weixin.qq.com/sns/jscode2session';
         $post_data = [
-            'appid'     =>  $app_id,
-            'secret'    =>  $app_secret,
+            'appid'     =>  env("WECHAT.DR_APP_ID"),
+            'secret'    =>  env("WECHAT.DR_APP_SECRET"),
             'grant_type'    =>  'authorization_code',
             'js_code'    =>  $code,
         ];
@@ -86,7 +84,13 @@ class Wechat
         $post_data['env_version'] = $env_version;//背景色透明
         $img = Common::curlPost($url, json_encode($post_data));
         //上传到七牛云
-        $qiniu = new \Swg\Composer\Qiniu();
+        $qiniu = new Qiniu();
         return $qiniu->uploadQiniu($img,1);
     }
+
+    public function getWechatMobile($code)
+    {
+        $data = $this->getOpenIdByCode($code);
+    }
+
 }
