@@ -1,5 +1,8 @@
 <?php
+
 namespace Swg\Composer;
+
+use ZipArchive;
 
 class Common
 {
@@ -49,7 +52,7 @@ class Common
      * @param bool $getCode
      * @return array|bool|string
      */
-    public static function curlGet(string $url,int $timeout = 10, bool $getCode = false)
+    public static function curlGet(string $url, int $timeout = 10, bool $getCode = false)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -95,5 +98,26 @@ class Common
             $image_data = file_get_contents($image_path);
         }
         return $image_data;
+    }
+
+    /**
+     * 创建zip压缩包
+     * Author: zhouhongcheng
+     * datetime 2022/11/8 18:55
+     * @method
+     * @route
+     * @param array $file_list 文件地址 ['a.txt','b.log']
+     * @param string $file_path_name zip保存地址和文件名 /path/test.zip
+     * @return bool
+     */
+    public static function createZip(array $file_list, string $file_path_name)
+    {
+        $zip = new ZipArchive();
+        $zip->open($file_path_name, ZipArchive::CREATE);   //打开压缩包
+        //遍历文件
+        foreach ($file_list as $file) {
+            $zip->addFile($file, basename($file));   //向压缩包中添加文件
+        }
+        return $zip->close();  //关闭压缩包
     }
 }

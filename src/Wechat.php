@@ -2,6 +2,7 @@
 namespace Swg\Composer;
 
 use Exception;
+use Swg\wechat\Crypt\WXBizDataCrypt;
 
 /** 微信类相关操作 */
 class Wechat
@@ -88,9 +89,26 @@ class Wechat
         return $qiniu->uploadQiniu($img,1);
     }
 
-    public function getWechatMobile($code)
+    /**
+     * 根据code、加密字符串、iv置换手机号
+     * Author: zhouhongcheng
+     * datetime 2022/11/8 10:24
+     * @method
+     * @route
+     * @param $code
+     * @param $encryptedData
+     * @param $iv
+     * @return false|mixed
+     */
+    public function getWechatMobile($code,$encryptedData,$iv)
     {
         $data = $this->getOpenIdByCode($code);
+        $crypt = new WXBizDataCrypt($data['session_key']);
+        $errCode = $crypt->decryptData($encryptedData, $iv, $data);     //解密
+        if ($errCode == 0) {
+            return json_decode($data,true);
+        }
+        return false;
     }
 
 }

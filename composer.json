@@ -1,21 +1,22 @@
 {
-    "name": "swg/composer",
-    "description": "swg common utility",
-    "type": "library",
-    "require": {
-        "php": ">=7.0",
-        "ext-curl": "*",
-        "ext-redis": "*"
-    },
-    "autoload": {
-        "psr-4": {
-            "Swg\\Composer\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "周洪成",
-            "email": "zhouhc@jqlink.cn"
-        }
-    ]
+  "name": "swg/composer",
+  "description": "swg common utility",
+  "type": "library",
+  "require": {
+    "php": ">=7.0",
+    "ext-curl": "*",
+    "ext-redis": "*",
+    "ext-zip": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Swg\\Composer\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "周洪成",
+      "email": "zhouhc@jqlink.cn"
+    }
+  ]
 }
