@@ -15,10 +15,10 @@ class RedisArea extends Redis
     const REDIS_PROVINCE_KEY = 'address_province';
     const REDIS_CITY_KEY_PREF = 'address_city_';
     const REDIS_COUNTY_KEY_PREF = 'address_county_';
-    const REDIS_TOWN_KEY_PREF = 'address_town_';
+    const REDIS_ALL_PARENT_KEY = 'address_all_parent';
 
     /** @var string 街道键 下划线后拼接 区级编号 */
-    const REDIS_AREA_STREET_KEY = 'area_street_';
+    const REDIS_STREET_KEY_PREF = 'area_street_';
 
     public function __construct()
     {
@@ -27,52 +27,16 @@ class RedisArea extends Redis
     }
 
     /**
-     * 添加省份信息
+     * 添加所有的省市县数据
      */
-    public function addProvince(array $data)
+    public function addAllParentAddress($data)
     {
-        $this->setAddressData(self::REDIS_PROVINCE_KEY, $data);
+        $this->setAddressData(self::REDIS_ALL_PARENT_KEY, $data);
     }
 
-    /**
-     * 获取省份信息
-     * @return array
-     */
-    public function getProvince(): ?array
+    public function getAllParentAddress()
     {
-        return $this->getAddressData(self::REDIS_PROVINCE_KEY);
-    }
-
-    /**
-     * 添加某个省份的城市信息
-     */
-    public function addCityOfProvince($province_id, $data)
-    {
-        $this->setAddressData(self::REDIS_CITY_KEY_PREF . $province_id, $data);
-    }
-
-    /**
-     * 获取某个省份的城市信息
-     */
-    public function getCityOfProvince($province_id)
-    {
-        $this->getAddressData(self::REDIS_CITY_KEY_PREF . $province_id);
-    }
-
-    /**
-     * 添加某个市的县信息
-     */
-    public function addCountyOfCity($city_id, $data)
-    {
-        $this->setAddressData(self::REDIS_COUNTY_KEY_PREF . $city_id, $data);
-    }
-
-    /**
-     * 获取某个市的县信息
-     */
-    public function getCountyOfCity($city_id)
-    {
-        $this->getAddressData(self::REDIS_COUNTY_KEY_PREF . $city_id);
+        return $this->getAddressData(self::REDIS_ALL_PARENT_KEY);
     }
 
     /**
@@ -80,7 +44,7 @@ class RedisArea extends Redis
      */
     public function addTownOfCounty($county_id, $data)
     {
-        $this->setAddressData(self::REDIS_TOWN_KEY_PREF . $county_id, $data);
+        $this->setAddressData(self::REDIS_STREET_KEY_PREF . $county_id, $data);
     }
 
     /**
@@ -88,7 +52,7 @@ class RedisArea extends Redis
      */
     public function getTownOfCounty($county_id)
     {
-        $this->getAddressData(self::REDIS_TOWN_KEY_PREF . $county_id);
+        $this->getAddressData(self::REDIS_STREET_KEY_PREF . $county_id);
     }
 
     /**
