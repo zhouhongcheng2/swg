@@ -7,7 +7,9 @@
     "ext-curl": "*",
     "ext-redis": "*",
     "ext-zip": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "ext-bcmath": "*",
+    "ext-mbstring": "*"
   },
   "autoload": {
     "psr-4": {
