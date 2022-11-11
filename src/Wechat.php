@@ -1,20 +1,22 @@
 <?php
+
 namespace Swg\Composer;
 
 use Exception;
 use Swg\wechat\Crypt\WXBizDataCrypt;
+use function Webmozart\Assert\Tests\StaticAnalysis\false;
 
 /** 微信类相关操作 */
 class Wechat
 {
     /** @var string 正式服 */
-    CONST ENV_VERSION_RELEASE = 'release';
+    const ENV_VERSION_RELEASE = 'release';
 
     /** @var string 体验版 */
-    CONST ENV_VERSION_TRIAL = 'trial';
+    const ENV_VERSION_TRIAL = 'trial';
 
     /** @var string 开发版 */
-    CONST ENV_VERSION_DEVELOP = 'develop';
+    const ENV_VERSION_DEVELOP = 'develop';
 
     /**
      * 获取微信access_token
@@ -26,7 +28,7 @@ class Wechat
      */
     public function getAccessToken()
     {
-        $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' .env("WECHAT.DR_APP_ID") . '&secret=' . env("WECHAT.DR_APP_SECRET");
+        $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . env("WECHAT.DR_APP_ID") . '&secret=' . env("WECHAT.DR_APP_SECRET");
         $token = Common::curlGet($url);
         if (empty($token)) return false;
         return json_decode($token, true);
@@ -48,13 +50,13 @@ class Wechat
         if (!$code) return false;
         $url = 'https://api.weixin.qq.com/sns/jscode2session';
         $post_data = [
-            'appid'     =>  env("WECHAT.DR_APP_ID"),
-            'secret'    =>  env("WECHAT.DR_APP_SECRET"),
-            'grant_type'    =>  'authorization_code',
-            'js_code'    =>  $code,
+            'appid'      => env("WECHAT.DR_APP_ID"),
+            'secret'     => env("WECHAT.DR_APP_SECRET"),
+            'grant_type' => 'authorization_code',
+            'js_code'    => $code,
         ];
-        $result = Common::curlPost($url,$post_data);
-        $result = json_decode($result,true);
+        $result = Common::curlPost($url, $post_data);
+        $result = json_decode($result, true);
         if (isset($result['errcode'])) {
             return false;
         }
@@ -74,7 +76,7 @@ class Wechat
      * @return false|string 返回七牛云地址
      * @throws Exception
      */
-    public function getWechatQrCode(string $access_token,string $scene,string $invite_path = 'pages/store/index',string $env_version = self::ENV_VERSION_RELEASE)
+    public function getWechatQrCode(string $access_token, string $scene, string $invite_path = 'pages/store/index', string $env_version = self::ENV_VERSION_RELEASE)
     {
         if (!$access_token || !$invite_path) return false;
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit';
@@ -86,29 +88,30 @@ class Wechat
         $img = Common::curlPost($url, json_encode($post_data));
         //上传到七牛云
         $qiniu = new Qiniu();
-        return $qiniu->uploadQiniu($img,1);
+        return $qiniu->uploadQiniu($img, 1);
     }
 
     /**
      * 根据code、加密字符串、iv置换手机号
      * Author: zhouhongcheng
      * datetime 2022/11/8 10:24
-     * @method
-     * @route
-     * @param $code
-     * @param $encryptedData
-     * @param $iv
-     * @return false|mixed
+     * @param string $code
+     * @param string $encryptedData
+     * @param string $iv
+     * @return array|false
      */
-    public function getWechatMobile($code,$encryptedData,$iv)
+    public function getWechatMobile(string $code, string $encryptedData, string $iv)
     {
+        // 获取微信openid和session_key
         $data = $this->getOpenIdByCode($code);
-        $crypt = new WXBizDataCrypt($data['session_key']);
-        $errCode = $crypt->decryptData($encryptedData, $iv, $data);     //解密
-        if ($errCode == 0) {
-            return json_decode($data,true);
+        // 置换手机号
+        $result = openssl_decrypt(base64_decode($encryptedData), "AES-128-CBC",
+            base64_decode($data['session_key']), 1, base64_decode($iv));
+        $dataObj = json_decode($result, true);
+        if (!$dataObj || !is_array($dataObj)) {
+            return false;
         }
-        return false;
+        return array_merge($data, $dataObj);
     }
 
 }

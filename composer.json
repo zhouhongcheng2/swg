@@ -6,7 +6,9 @@
     "php": ">=7.0",
     "ext-curl": "*",
     "ext-redis": "*",
-    "ext-zip": "*"
+    "ext-zip": "*",
+    "ext-bcmath": "*",
+    "ext-mbstring": "*"
   },
   "autoload": {
     "psr-4": {
