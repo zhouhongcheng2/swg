@@ -4,6 +4,7 @@ namespace Swg\Composer;
 
 use app\exception\BusinessException;
 use app\exception\CodeResponse;
+use app\exception\FatalErrorException;
 
 /**
  * 百度云第三方api
@@ -46,13 +47,13 @@ class BaiduCloud
      * datetime 2022/11/10 14:34
      * @param string $text 识别内容
      * @return array|false
-     * @throws BusinessException
+     * @throws FatalErrorException
      */
     public function getAddress(string $text = '')
     {
         $url = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/address';
         if (!$this->access_token) {
-            throw new BusinessException(CodeResponse::FAILURE, '地址识别授权失败');
+            throw new FatalErrorException(CodeResponse::FAILURE, '地址识别授权失败');
         }
         $url .= '?access_token=' . $this->access_token;
         $data = [
@@ -96,11 +97,36 @@ class BaiduCloud
         $city_code = $address_data['city_code'] ? str_pad($address_data['city_code'], 12, 0) : null;
         $county_code = $address_data['county_code'] ? str_pad($address_data['county_code'], 12, 0) : null;
         $town_code = $address_data['town_code'] ? str_pad($address_data['town_code'], 12, 0) : null;
-        $province_list = $this->redis_area->getAllParentAddress();
-        if (!$province_list) {
+
+        $province = $this->redis_area->getProvince($province_code);
+        if (!$province) {
             return false;
         }
-        foreach ($province_list as $value) {
+        $data['province_id'] = $province['id'];
+        $data['province'] = $province['name'];
+
+        $city = $this->redis_area->getCityOfProvince($province['id'], $city_code);
+        if (!$city) {
+            return $data;
+        }
+        $data['city_id'] = $city['id'];
+        $data['city'] = $city['name'];
+
+        $county = $this->redis_area->getCountyOfCity($city['id'], $county_code);
+        if (!$county) {
+            return $data;
+        }
+        $data['county_id'] = $county['id'];
+        $data['county'] = $county['name'];
+
+        $town = $this->redis_area->getTownOfCounty($county['id'],$town_code);
+        if (!$town){
+            return $data;
+        }
+        $data['town_id'] = $town['id'];
+        $data['town'] = $town['name'];
+
+        /*foreach ($province_list as $value) {
             if ($province_code == $value->province_id) {
                 $data['province_id'] = $value->id;
                 $data['province'] = $value->name;
@@ -142,7 +168,7 @@ class BaiduCloud
                 }
                 break;
             }
-        }
+        }*/
         return $data;
     }
 

@@ -2,10 +2,10 @@
 
 namespace Swg\Composer;
 
+require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
+
 use Swg\Redis\Redis;
 
-// require_once 'sdk/redis/Redis.php';
-require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 
 /** redis中国地址库 */
 class RedisArea extends Redis
@@ -34,7 +34,7 @@ class RedisArea extends Redis
      * 添加省市县树形
      * @param array $data 树形数组
      */
-    public function addAllParentAddress(array $data)
+    public function setCPPTree(array $data)
     {
         $this->setAddressData(self::REDIS_ALL_PARENT_KEY, $data);
     }
@@ -53,18 +53,40 @@ class RedisArea extends Redis
     /**
      * 添加省份信息
      */
-    public function addProvince(array $data)
+    public function setProvince(array $data)
     {
-        $this->setAddressData(self::REDIS_PROVINCE_KEY, $data);
+        $set_list = [];
+        foreach ($data as $province) {
+            $set_list[$province['province_id']] = json_encode($province);
+        }
+        $this->redis->hMSet(self::REDIS_PROVINCE_KEY, $set_list);
     }
 
     /**
-     * 获取所有省份信息
+     * 获取省份信息
+     * @param string|null $code 省份编码；null 获取所有省份
      * @return array
      */
-    public function getProvince(): ?array
+    public function getProvince(string $code = null): ?array
     {
-        return $this->getAddressData(self::REDIS_PROVINCE_KEY);
+        return $this->getHSetData(self::REDIS_PROVINCE_KEY, $code);
+    }
+
+    private function getHSetData($key, string $code = null): ?array
+    {
+        if (is_null($code)) {
+            $json_array = $this->redis->hVals($key);
+            if (empty($json_array)) return null;
+            return array_map(function ($val) {
+                return json_decode($val, true);
+            }, $json_array);
+        }
+
+        $json = $this->redis->hGet($key, $code);
+        if (empty($json)) {
+            return null;
+        }
+        return json_decode($json, true);
     }
 
     #=======【 市 】=====================================
@@ -74,9 +96,14 @@ class RedisArea extends Redis
      * @param int $province_id 省份id
      * @param $data
      */
-    public function addCityOfProvince(int $province_id, $data)
+    public function setCityOfProvince(int $province_id, $data)
     {
-        $this->setAddressData(self::REDIS_CITY_KEY_PREF . $province_id, $data);
+        // $this->setAddressData(self::REDIS_CITY_KEY_PREF . $province_id, $data);
+        $set_list = [];
+        foreach ($data as $item) {
+            $set_list[$item['city_id']] = json_encode($item);
+        }
+        $this->redis->hMSet(self::REDIS_CITY_KEY_PREF . $province_id, $set_list);
     }
 
     /**
@@ -84,9 +111,10 @@ class RedisArea extends Redis
      * @param int $province_id 省份id
      * @return array|null 城市列表
      */
-    public function getCityOfProvince(int $province_id): ?array
+    public function getCityOfProvince(int $province_id, $city_code = null): ?array
     {
-        return $this->getAddressData(self::REDIS_CITY_KEY_PREF . $province_id);
+        // return $this->getAddressData(self::REDIS_CITY_KEY_PREF . $province_id);
+        return $this->getHSetData(self::REDIS_CITY_KEY_PREF . $province_id, $city_code);
     }
 
     #=======【 县 】=====================================
@@ -96,9 +124,14 @@ class RedisArea extends Redis
      * @param int $city_id 市id
      * @param $data
      */
-    public function addCountyOfCity(int $city_id, $data)
+    public function setCountyOfCity(int $city_id, $data)
     {
-        $this->setAddressData(self::REDIS_COUNTY_KEY_PREF . $city_id, $data);
+        // $this->setAddressData(self::REDIS_COUNTY_KEY_PREF . $city_id, $data);
+        $set_list = [];
+        foreach ($data as $item) {
+            $set_list[$item['county_id']] = json_encode($item);
+        }
+        $this->redis->hMSet(self::REDIS_COUNTY_KEY_PREF . $city_id, $set_list);
     }
 
     /**
@@ -106,11 +139,11 @@ class RedisArea extends Redis
      * @param int $city_id 市id
      * @return array|null 县区列表
      */
-    public function getCountyOfCity(int $city_id): ?array
+    public function getCountyOfCity(int $city_id, $county_code = null): ?array
     {
-        return $this->getAddressData(self::REDIS_COUNTY_KEY_PREF . $city_id);
+        // return $this->getAddressData(self::REDIS_COUNTY_KEY_PREF . $city_id);
+        return $this->getHSetData(self::REDIS_CITY_KEY_PREF . $city_id, $county_code);
     }
-
 
     #=======【 街 】=====================================
 
@@ -119,25 +152,30 @@ class RedisArea extends Redis
      * @param int $county_id 县id
      * @param array $data
      */
-    public function addTownOfCounty(int $county_id, array $data)
+    public function setTownOfCounty(int $county_id, array $data)
     {
-        $this->setAddressData(self::REDIS_STREET_KEY_PREF . $county_id, $data);
+        $set_list = [];
+        foreach ($data as $item) {
+            $set_list[$item['town_id']] = json_encode($item);
+        }
+        $this->redis->hMSet(self::REDIS_STREET_KEY_PREF . $county_id, $set_list);
     }
 
     /**
      * 获取某个县的街道
      * @param int $county_id 县区id
-     * @return array|null 街道列表
+     * @return array|null 街道获取街道列表
      */
-    public function getTownOfCounty(int $county_id): ?array
+    public function getTownOfCounty(int $county_id, $town_code = null): ?array
     {
-        return $this->getAddressData(self::REDIS_STREET_KEY_PREF . $county_id);
+        return $this->getHSetData(self::REDIS_STREET_KEY_PREF . $county_id, $town_code);
     }
 
     #=======【 set/get 】=====================================
 
     public function setAddressData(string $area_key, array $data): bool
     {
+        $this->redis->del($area_key);//需要先删除，否则hash set无法覆盖
         return $this->redis->set($area_key, json_encode($data));
     }
 
@@ -145,4 +183,5 @@ class RedisArea extends Redis
     {
         return json_decode($this->redis->get($area_key));
     }
+
 }
