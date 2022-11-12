@@ -5,6 +5,7 @@ namespace Swg\Composer;
 use app\exception\BusinessException;
 use app\exception\CodeResponse;
 use app\exception\FatalErrorException;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * 百度云第三方api
@@ -97,78 +98,34 @@ class BaiduCloud
         $city_code = $address_data['city_code'] ? str_pad($address_data['city_code'], 12, 0) : null;
         $county_code = $address_data['county_code'] ? str_pad($address_data['county_code'], 12, 0) : null;
         $town_code = $address_data['town_code'] ? str_pad($address_data['town_code'], 12, 0) : null;
-
-        $province = $this->redis_area->getProvince($province_code);
+        $province = empty($province_code) ? null : $this->redis_area->getProvince($province_code);
         if (!$province) {
             return false;
         }
         $data['province_id'] = $province['id'];
         $data['province'] = $province['name'];
 
-        $city = $this->redis_area->getCityOfProvince($province['id'], $city_code);
+        $city = empty($city_code) ? null : $this->redis_area->getCityOfProvince($province['id'], $city_code);
         if (!$city) {
             return $data;
         }
         $data['city_id'] = $city['id'];
         $data['city'] = $city['name'];
 
-        $county = $this->redis_area->getCountyOfCity($city['id'], $county_code);
+        $county = empty($county_code) ? null : $this->redis_area->getCountyOfCity($city['id'], $county_code);
         if (!$county) {
             return $data;
         }
         $data['county_id'] = $county['id'];
         $data['county'] = $county['name'];
 
-        $town = $this->redis_area->getTownOfCounty($county['id'],$town_code);
-        if (!$town){
+        $town = empty($town_code) ? null : $this->redis_area->getTownOfCounty($county['id'], $town_code);
+        if (!$town) {
             return $data;
         }
         $data['town_id'] = $town['id'];
         $data['town'] = $town['name'];
 
-        /*foreach ($province_list as $value) {
-            if ($province_code == $value->province_id) {
-                $data['province_id'] = $value->id;
-                $data['province'] = $value->name;
-                if (!$city_code) {
-                    // 没有市，直接跳过
-                    break;
-                }
-                foreach ($value->children as $city) {
-                    if ($city_code == $city->city_id) {
-                        $data['city_id'] = $city->id;
-                        $data['city'] = $city->name;
-                        if (!$county_code) {
-                            break;
-                        }
-                        // 处理区
-                        foreach ($city->children as $county) {
-                            if ($county_code == $county->county_id) {
-                                $data['county_id'] = $county->id;
-                                $data['county'] = $county->name;
-                                if (!$town_code) {
-                                    break;
-                                }
-                                $town_list = $this->redis_area->getTownOfCounty($county->id);
-                                if (!$town_list) {
-                                    break;
-                                }
-                                foreach ($town_list as $town) {
-                                    if ($town_code == $town->town_id) {
-                                        $data['town_id'] = $town->id;
-                                        $data['town'] = $town->name;
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
-                break;
-            }
-        }*/
         return $data;
     }
 
