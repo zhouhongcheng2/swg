@@ -2,7 +2,6 @@
 
 namespace Swg\Composer;
 
-use app\exception\BusinessException;
 use app\exception\CodeResponse;
 use app\exception\FatalErrorException;
 use Symfony\Component\VarDumper\VarDumper;
@@ -54,7 +53,7 @@ class BaiduCloud
     {
         $url = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/address';
         if (!$this->access_token) {
-            throw new FatalErrorException(CodeResponse::FAILURE, '地址识别授权失败');
+            throw new FatalErrorException('地址识别授权失败');
         }
         $url .= '?access_token=' . $this->access_token;
         $data = [
@@ -63,8 +62,12 @@ class BaiduCloud
         $header = [
             'Content-Type:application/json',
         ];
-        $res = Common::curlPost($url, json_encode($data), $header);
-        $data_obj = json_decode($res, true);
+        $res = Common::curlPost($url, json_encode($data), $header,5,true);
+        if ($res['http_code']!=200){
+            throw new FatalErrorException("地址识别返回状态码(${$res['http_code']})");
+        }
+
+        $data_obj = json_decode($res['data'], true);
         if (!$data_obj || !is_array($data_obj)) {
             return false;
         }
