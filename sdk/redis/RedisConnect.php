@@ -22,12 +22,12 @@ final class RedisConnect
     {
         try {
             if (!self::$instance instanceof \Redis) {
-                $host = 'r-bp1sro7jzd202d40onpd.redis.rds.aliyuncs.com';
+                $host = env('REDIS.HOST','r-bp1sro7jzd202d40onpd.redis.rds.aliyuncs.com');
                 $port = 6379;
                 $timeout = 20;
                 $redis = new \Redis();
                 $redis->connect($host, $port, $timeout);
-                $redis->auth('csNE5u4k8XYX2');
+                $redis->auth(env('REDIS.PASSWORD','csNE5u4k8XYX2'));
                 self::$instance = $redis;
             }
         } catch (\RedisException $e) {
