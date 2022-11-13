@@ -1,11 +1,9 @@
 <?php
 
 namespace Swg\Composer;
-
 require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 
 use Swg\Redis\Redis;
-
 
 /** redis中国地址库 */
 class RedisArea extends Redis
@@ -57,7 +55,7 @@ class RedisArea extends Redis
     {
         $set_list = [];
         foreach ($data as $province) {
-            $set_list[$province['province_id']] = json_encode($province);
+            $set_list[$province['province_id']] = $this->encode($province);
         }
         $this->updateHSet(self::REDIS_PROVINCE_KEY, $set_list);
     }
@@ -85,7 +83,7 @@ class RedisArea extends Redis
     {
         $set_list = [];
         foreach ($data as $item) {
-            $set_list[$item['city_id']] = json_encode($item);
+            $set_list[$item['city_id']] = $this->encode($item);
         }
         $this->updateHSet(self::REDIS_CITY_KEY_PREF . $province_id, $set_list);
 
@@ -112,7 +110,7 @@ class RedisArea extends Redis
     {
         $set_list = [];
         foreach ($data as $item) {
-            $set_list[$item['county_id']] = json_encode($item);
+            $set_list[$item['county_id']] = $this->encode($item);
         }
         $this->updateHSet(self::REDIS_COUNTY_KEY_PREF . $city_id, $set_list);
     }
@@ -138,7 +136,7 @@ class RedisArea extends Redis
     {
         $set_list = [];
         foreach ($data as $item) {
-            $set_list[$item['town_id']] = json_encode($item);
+            $set_list[$item['town_id']] = $this->encode($item);
         }
         $this->updateHSet(self::REDIS_STREET_KEY_PREF . $county_id, $set_list);
     }
@@ -158,34 +156,11 @@ class RedisArea extends Redis
     private function setAddressData(string $area_key, array $data): bool
     {
         $this->redis->del($area_key);//需要先删除，否则hash set无法覆盖
-        return $this->redis->set($area_key, json_encode($data));
+        return $this->redis->set($area_key, $this->encode($data));
     }
 
     private function getAddressData(string $area_key)
     {
         return json_decode($this->redis->get($area_key));
-    }
-
-    private function updateHSet($key, array $set_list): void
-    {
-        $this->redis->del($key);
-        $this->redis->hMSet($key, $set_list);
-    }
-
-    private function getHSetData($key, string $code = null): ?array
-    {
-        if (is_null($code)) {
-            $json_array = $this->redis->hVals($key);
-            if (empty($json_array)) return null;
-            return array_map(function ($val) {
-                return json_decode($val, true);
-            }, $json_array);
-        }
-
-        $json = $this->redis->hGet($key, $code);
-        if (empty($json)) {
-            return null;
-        }
-        return json_decode($json, true);
     }
 }
