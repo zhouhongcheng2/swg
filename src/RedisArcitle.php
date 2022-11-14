@@ -28,13 +28,14 @@ class RedisArcitle extends Redis
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    public function setArticleByTitle(string $title){
-        $list= ArticleList::getListByTitleForRedis($title);
-        $arr=[];
-        foreach ($list as $value){
-            $arr[$value['articleCate']['module'].'_id_'.$value]=$this->encode($value->toArray());
+    public function setArticleByTitle(string $title)
+    {
+        $list = ArticleList::getListByTitleForRedis($title);
+        $arr = [];
+        foreach ($list as $value) {
+            $arr[$value['articleCate']['module'] . '_id_' . $value] = $this->encode($value->toArray());
         }
-        return $this->redis->hMSet(self::REDIS_KEY, $set_list);
+        return $this->redis->hMSet(self::REDIS_KEY, $arr);
     }
 
     /**
@@ -45,7 +46,8 @@ class RedisArcitle extends Redis
      * @param mixed $module
      * @return array|null
      */
-    public function getArticle($id,$module){
-        return$this->getHSetData('article',$module.'_id_'.$id);
+    public function getArticle($id, $module)
+    {
+        return $this->getHSetData('article', $module . '_id_' . $id);
     }
 }
