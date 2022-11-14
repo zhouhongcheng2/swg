@@ -95,8 +95,12 @@ class Aliyun
                 'Content-Type:application/json; charset=UTF-8',
             ];
             // 获取图片的base64
-            $image_data = Common::imageToBase64($img_path, $is_local);
-            if (!$image_data) throw new Exception('图片转换失败');
+            if ($is_local) {
+                $image_data = Common::imageToBase64($img_path, $is_local);
+                if (!$image_data) throw new Exception('图片转换失败');
+            } else {
+                $image_data = $img_path;
+            }
             // 请求数据
             $data = [
                 'image'     => $image_data,
@@ -143,9 +147,13 @@ class Aliyun
                 'Authorization:APPCODE ' . $appcode,
                 'Content-Type:application/json; charset=UTF-8',
             ];
-            // 图片转base64
-            $image_data = Common::imageToBase64($img_path, $is_local);
-            if (!$image_data) throw new Exception('图片转换失败');
+            // 获取图片的base64
+            if ($is_local) {
+                $image_data = Common::imageToBase64($img_path, $is_local);
+                if (!$image_data) throw new Exception('图片转换失败');
+            } else {
+                $image_data = $img_path;
+            }
             $res = json_decode(Common::curlPost($url, json_encode(['image' => $image_data]), $header), true);
             if ($res && is_array($res) && !empty($res['success'])) {
                 return [
