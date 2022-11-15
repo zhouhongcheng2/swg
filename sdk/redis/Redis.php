@@ -37,6 +37,9 @@ class Redis
         }
     }
 
+    /**
+     * 该接口是删除老数据重新添加
+     */
     protected function updateHSet($key, array $set_list): bool
     {
         $this->redis->del($key);
