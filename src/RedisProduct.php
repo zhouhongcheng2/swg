@@ -138,7 +138,7 @@ class RedisProduct extends Redis
      * @param int $limit
      * @return array[]|null
      */
-    public function getProductList(int $page = null, int $limit = 10): ?array
+    public function getProductList(?int $page = null, ?int $limit = 10): ?array
     {
         //返回全部
         if (is_null($page)) {
