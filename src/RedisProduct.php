@@ -3,7 +3,6 @@
 namespace Swg\Composer;
 
 use Swg\Redis\Redis;
-use think\Collection;
 
 // require_once 'sdk/redis/Redis.php';
 require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
@@ -108,10 +107,9 @@ class RedisProduct extends Redis
      * @method
      * @route
      */
-    public function setProductList(Collection $all): bool
+    public function setProductList(array $products): bool
     {
         //存储所有商品
-        $products = $all->toArray();
         $product_origin = [];
 
         //删除历史数据
@@ -131,6 +129,27 @@ class RedisProduct extends Redis
     }
 
     /**
+     * 更新/添加单个商品信息
+     */
+    public function updateProduct(array $product)
+    {
+        //更新商品真实信息
+        $id = $product['id'];
+        $this->redis->hMSet(self::PRODUCT_ORIGIN, [$id => $this->encode($product)]);
+
+        //更新商品赠品列表
+        if ($product['is_reward']) {
+            //更新赠品商品列表
+            $this->redis->zAdd(self::GIFT_LIST_KEY, $product['sort'], $id);
+            $this->redis->zRem(self::PRODUCT_LIST_KEY, $id);
+        } else {
+            //更新普通商品列表
+            $this->redis->zAdd(self::PRODUCT_LIST_KEY, $product['sort'], $id);
+            $this->redis->zRem(self::GIFT_LIST_KEY, $id);
+        }
+    }
+
+    /**
      * 获取商品列表信息 按sort从大到小
      * Author: zhouhongcheng
      * datetime 2022/11/4 17:17
@@ -138,7 +157,7 @@ class RedisProduct extends Redis
      * @param int $limit
      * @return array[]|null
      */
-    public function getProductList(?int $page = null, ?int $limit = 10): ?array
+    public function getProductList(int $page = null, int $limit = 10): ?array
     {
         //返回全部
         if (is_null($page)) {
