@@ -174,6 +174,12 @@ class RedisProduct extends Redis
         return array_values($products);
     }
 
+    /**
+     * 获取 以商品编号为健的数组
+     * datetime 2022/11/15 17:52
+     * @method post
+     * @return array|null
+     */
     public function getProductListIdAsKey(): ?array
     {
         $ids = $this->redis->zRevRange(self::PRODUCT_LIST_KEY, 0, -1);
