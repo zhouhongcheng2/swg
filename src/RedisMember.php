@@ -12,6 +12,7 @@ class RedisMember extends Redis
 {
     /** @var string 用户等级名称 */
     const REDIS_MEMBER_LEVEL_NAME_KEY = 'member_level_name';
+    const REDIS_C_MEMBER_INFO_PREF = 'c_member_';
 
     public function __construct()
     {
@@ -28,7 +29,7 @@ class RedisMember extends Redis
      * @param array $member_level_name ['1'=>'用户','2'=>'会员','3'=>'加盟','4'=>'旗舰','5'=>'联创']
      * @return bool
      */
-    public function setMemberLevelName(array $member_level_name)
+    public function setMemberLevelName(array $member_level_name): bool
     {
         return $this->redis->set(self::REDIS_MEMBER_LEVEL_NAME_KEY, json_encode($member_level_name));
     }
@@ -43,5 +44,30 @@ class RedisMember extends Redis
     public function getMemberLevelName()
     {
         return json_decode($this->redis->get(self::REDIS_MEMBER_LEVEL_NAME_KEY), true);
+    }
+
+    /**
+     * 设置用户信息
+     * Author: yyl
+     * datetime 2022/11/16 09:57
+     * @param int $member_id
+     * @param array $data
+     * @return bool
+     */
+    public function setMemberInfo(int $member_id, array $data): bool
+    {
+        return $this->setData(self::REDIS_C_MEMBER_INFO_PREF . $member_id, $data);
+    }
+
+    /**
+     * 获取用户信息
+     * Author: yyl
+     * datetime 2022/11/16 09:58
+     * @param $member_id
+     * @return array|null
+     */
+    public function getMemberInfo($member_id): ?array
+    {
+        return $this->getData(self::REDIS_C_MEMBER_INFO_PREF . $member_id);
     }
 }

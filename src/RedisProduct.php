@@ -98,10 +98,8 @@ class RedisProduct extends Redis
 
     /**
      * 设置商品列表信息
-     * @param Collection $all 商品数据
+     * @param array $products 商品数据
      * @return bool
-     * @todo 还未处理分页问题
-     * 注：商品入库时把价格更改为元，按照sort排序 好入库
      * Author: zhouhongcheng
      * datetime 2022/11/4 17:16
      * @method

@@ -101,4 +101,28 @@ class Redis
         $end = $start + $limit - 1;
         return array($start, $end);
     }
+
+    /**
+     * 设置数据
+     * @param $key
+     * @param array $data
+     * @return bool
+     */
+    public function setData($key, array $data): bool
+    {
+        return $this->redis->set($key, $this->encode($data));
+    }
+
+    /**
+     * 获取数据
+     * @return array|mixed
+     */
+    public function getData($key)
+    {
+        $data = $this->redis->get($key);
+        if (!$data) {
+            return null;
+        }
+        return json_decode($data,true);
+    }
 }
