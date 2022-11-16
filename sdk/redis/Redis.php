@@ -123,6 +123,16 @@ class Redis
         if (!$data) {
             return null;
         }
-        return json_decode($data,true);
+        return json_decode($data, true);
+    }
+
+    /**
+     * 删除数据
+     * @param int|string|array $keys
+     * @return int 返回成功删除的数据个数 (数据不存在会当成删除成功)
+     */
+    public function delete($keys): int
+    {
+        return $this->redis->del($keys);
     }
 }
