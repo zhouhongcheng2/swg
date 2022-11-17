@@ -8,6 +8,8 @@ use AdaPaySdk\SettleAccount;
 use AdaPaySdk\CorpMember;
 use AdaPaySdk\PaymentConfirm;
 use AdaPaySdk\Refund;
+use AdaPaySdk\AdapayTools;
+use AdaPaySdk\PaymentReverse;
 
 /** 汇付天下支付模块 */
 class Adapay
@@ -185,8 +187,8 @@ class Adapay
     }
 
     /**
-     * 调用ada支付【延时分账】
-     * 注意：接口返回的【Adapay生成的支付对象id】 party_order_id字段一定要记录下来
+     * 调用ada支付【延时分账】-订单支付接口
+     * 注意：接口返回的【Adapay生成的支付对象id】 id字段一定要记录下来
      * Author: zhouhongcheng
      * datetime 2022/11/10 14:20
      * @method
@@ -316,7 +318,7 @@ class Adapay
         $this->ada_data['reason'] = $reason;//退款描述
         $this->ada_data['device_info'] = [
             'device_type' => $device_type,//设备类型，1 :手机， 2 :平板， 3:手表， 4:PC
-            'device_ip'   => request()->ip()//交易设备所在的公网 IP
+            // 'device_ip'   => request()->ip()//交易设备所在的公网 IP
         ];//前端设备信息
         # 发起退款
         $refund->create($this->ada_data);
@@ -324,6 +326,89 @@ class Adapay
             return ['res' => false, 'msg' => "调用退款异常：" . $refund->result['error_msg'] . "【" . $refund_order_sn . "】"];
         }
         return ['res' => true, 'data' => ['payment' => $refund->result]];
+    }
+
+    /**
+     * 延时分账-订单撤销【延时分账退款】
+     * 不用再调用退款接口
+     * 需要记录返回的id
+     * Author: zhouhongcheng
+     * datetime 2022/11/17 11:37
+     * @method
+     * @route
+     * @param string $adapay_order_sn Adapay生成的支付对象id
+     * @param string $refund_order_sn 退款订单号
+     * @param int $refund_amt 退款金额单位分
+     * @param string $reason 退款原因
+     * @param string $notify_url 异步通知地址，url为http /https路径，服务器POST回调，URL 上请勿附带参数。
+     * @param int $device_type 设备类型
+     * @return array
+     */
+    public function createReverse(string $adapay_order_sn, string $refund_order_sn, int $refund_amt, string $reason, string $notify_url, int $device_type = 1): array
+    {
+        # 初始化支付类
+        $payment = new PaymentReverse();
+        $this->ada_data['payment_id'] = $adapay_order_sn;
+        $this->ada_data['order_no'] = $refund_order_sn;
+        $this->ada_data['reverse_amt'] = bcmul($refund_amt, 0.01, 2);;
+        $this->ada_data['notify_url'] = $notify_url;
+        $this->ada_data['reason'] = $reason;
+        $this->ada_data['device_info'] = [
+            'device_type' => $device_type,//设备类型，1 :手机， 2 :平板， 3:手表， 4:PC
+            // 'device_ip'   => request()->ip()//交易设备所在的公网 IP
+        ];//前端设备信息
+        # 发起撤销退款
+        $payment->create($this->ada_data);
+        # 对支付结果进行处理
+        if ($payment->isError()) {
+            return ['res' => false, 'msg' => "调用撤销订单异常：" . $payment->result['error_msg'] . "【" . $adapay_order_sn . "】"];
+        }
+        return ['res' => true, 'data' => ['payment' => $payment->result]];
+    }
+
+    /**
+     * 延时分账-查询订单撤销【查询延时分账退款状态】
+     * Author: zhouhongcheng
+     * datetime 2022/11/17 13:48
+     * @method
+     * @route
+     * @param $reverse_id
+     * @return array
+     */
+    public function queryReverse($reverse_id): array
+    {
+        $payment = new PaymentReverse();
+        unset($this->ada_data['app_id']);
+        $this->ada_data['reverse_id'] = $reverse_id;
+        $payment->query($this->ada_data);
+
+        # 对支付结果进行处理
+        if ($payment->isError()) {
+            return ['res' => false, 'msg' => "调用撤销订单异常：" . $payment->result['error_msg'] . "【" . $reverse_id . "】"];
+        }
+        return ['res' => true, 'data' => ['payment' => $payment->result]];
+    }
+
+    /**
+     * 签名验证
+     * Author: zhouhongcheng
+     * datetime 2022/11/17 11:13
+     * @method
+     * @route
+     * @param string $post_data_str post返回的参数
+     * @param string $post_sign_str 签名
+     * @return array
+     */
+    public function callBack(string $post_data_str, string $post_sign_str): array
+    {
+        $adapay_tools = new AdapayTools();
+        # 先校验签名和返回的数据的签名的数据是否一致
+        $sign_flag = $adapay_tools->verifySign($post_data_str, $post_sign_str);
+        if ($sign_flag) {
+            return ['res' => true];
+        } else {
+            return ['res' => false, 'msg' => '签名验证失败'];
+        }
     }
 
     /**
