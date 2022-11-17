@@ -152,10 +152,10 @@ class RedisProduct extends Redis
      * Author: zhouhongcheng
      * datetime 2022/11/4 17:17
      * @param int|null $page
-     * @param int $limit
+     * @param int|null $limit
      * @return array[]|null
      */
-    public function getProductList(int $page = null, int $limit = 10): ?array
+    public function getProductList(?int $page = null, ?int $limit = 10): ?array
     {
         //返回全部
         if (is_null($page)) {
