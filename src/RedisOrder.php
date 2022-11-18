@@ -82,9 +82,9 @@ class RedisOrder extends Redis
      * @route
      * @return bool|mixed
      */
-    public function getCustomerOrder()
+    public function getCustomerOrder($key = self::REDIS_CUSTOMER_ORDER_KEY)
     {
-        return $this->redis->rPop(self::REDIS_CUSTOMER_ORDER_KEY);
+        return $this->redis->rPop($key);
     }
 
     /**
