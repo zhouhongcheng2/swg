@@ -4,14 +4,15 @@ namespace Swg\Composer;
 
 use Swg\Redis\Redis;
 
-require_once 'sdk/redis/Redis.php';
-// require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
+// require_once 'sdk/redis/Redis.php';
+require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 
 /** redis 快递公司信息 */
 class RedisExpress extends Redis
 {
     /** @var string 快递公司key */
-    const EXPRESS_COMPANY_LIST = 'express_list';
+    const EXPRESS_COMPANY_LIST_ID = 'express_list_id';
+    const EXPRESS_COMPANY_LIST_QDB = 'express_list_qdb';
 
     public function __construct()
     {
@@ -30,11 +31,13 @@ class RedisExpress extends Redis
      */
     public function setExpressList(array $company)
     {
-        $data = [];
+        $data_id = [];
+        $data_qbd = [];
         foreach ($company as $value) {
-            $data[$value['id']] = $this->encode($value);
+            $data_id[$value['id']] = $this->encode($value);
+            $data_qbd[$value['qdb_code']] = $this->encode($value);
         }
-        return $this->updateHSet(self::EXPRESS_COMPANY_LIST, $data);
+        return $this->updateHSet(self::EXPRESS_COMPANY_LIST_ID, $data_id) && $this->updateHSet(self::EXPRESS_COMPANY_LIST_QDB, $data_qbd);
     }
 
     /**
@@ -43,11 +46,12 @@ class RedisExpress extends Redis
      * datetime 2022/11/20 16:05
      * @method
      * @route
-     * @param int $company_id
+     * @param string $company_id
+     * @param string $key
      * @return mixed
      */
-    public function getExpressById(int $company_id)
+    public function getExpressById(string $company_id, string $key = self::EXPRESS_COMPANY_LIST_QDB)
     {
-        return json_decode($this->redis->hGet(self::EXPRESS_COMPANY_LIST, $company_id), true);
+        return json_decode($this->redis->hGet($key, $company_id), true);
     }
 }
