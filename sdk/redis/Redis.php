@@ -23,6 +23,9 @@ class Redis
     /** @var int 地址库 */
     const REDIS_AREA_DB = 5;
 
+    /** @var int 快递公司信息 */
+    const REDIS_EXPRESS_COMPANY_DB = 5;
+
     /**
      * @throws Exception
      */
