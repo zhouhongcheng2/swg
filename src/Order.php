@@ -16,7 +16,7 @@ class Order
      * @param int $len 随机字符长度
      * @return string
      */
-    public function createOrderNumber(string $type = '',int $len = 6)
+    public function createOrderNumber(string $type = '', int $len = 6)
     {
         $str = '';
         switch ($type) {
@@ -31,6 +31,6 @@ class Order
                 break;
         }
         $pool = '0123456789';
-        return $str . date("Ymdis") . substr(str_shuffle(str_repeat($pool, ceil($len / strlen($pool)))), 0, $len);
+        return $str . substr(date("Y"), 2) . date("mdHis") . substr(str_shuffle(str_repeat($pool, ceil($len / strlen($pool)))), 0, $len);
     }
 }
