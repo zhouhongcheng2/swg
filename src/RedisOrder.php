@@ -91,51 +91,51 @@ class RedisOrder extends Redis
      * C端订单退款申请成功写入订单
      * Author: lvg
      * datetime 2022/11/17 10:25
-     * @param string $order_sn 订单编号
+     * @param array $data
      * @return false|int|\Redis
      * @throws RedisException
      */
-    public function pushCustomerOrderRefund(string $order_sn)
+    public function pushCustomerOrderRefund(array $data)
     {
-        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_REFUND_KEY, $order_sn);
+        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_REFUND_KEY, json_encode($data));
     }
 
     /**
      * C端订单退款申请驳回写入订单
      * Author: lvg
      * datetime 2022/11/17 10:25
-     * @param string $order_sn 订单编号
+     * @param array $data
      * @return false|int|\Redis
      * @throws RedisException
      */
-    public function pushCustomerOrderRefundReject(string $order_sn)
+    public function pushCustomerOrderRefundReject(array $data)
     {
-        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_REFUND_REJECT_KEY, $order_sn);
+        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_REFUND_REJECT_KEY, json_encode($data));
     }
 
     /**
      * C端订单退款成功写入订单
      * Author: lvg
      * datetime 2022/11/17 10:25
-     * @param string $order_sn 订单编号
+     * @param array $data
      * @return false|int|\Redis
      * @throws RedisException
      */
-    public function pushCustomerOrderRefundSuccess(string $order_sn)
+    public function pushCustomerOrderRefundSuccess(array $data)
     {
-        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_REFUND_SUCCESS_KEY, $order_sn);
+        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_REFUND_SUCCESS_KEY, json_encode($data));
     }
 
     /**
      * C端修改地址成功写入订单
      * Author: lvg
      * datetime 2022/11/17 10:25
-     * @param string $order_sn 订单编号
+     * @param array $data 写入数据
      * @return false|int|\Redis
      * @throws RedisException
      */
-    public function pushCustomerOrderUpdateAddress(string $order_sn)
+    public function pushCustomerOrderUpdateAddress(array $data)
     {
-        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_UPDATE_ADDRESS_KEY, $order_sn);
+        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_UPDATE_ADDRESS_KEY, json_encode($data));
     }
 }
