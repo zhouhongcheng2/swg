@@ -9,11 +9,15 @@
     "ext-zip": "*",
     "ext-json": "*",
     "ext-bcmath": "*",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "ext-dom": "*",
+    "ext-simplexml": "*",
+    "ext-libxml": "*"
   },
   "autoload": {
     "psr-4": {
-      "Swg\\Composer\\": "src/"
+      "Swg\\Composer\\": "src/",
+      "Swg\\Sdk\\": "sdk/"
     }
   },
   "authors": [
