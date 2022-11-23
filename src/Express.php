@@ -38,6 +38,46 @@ class Express
     }
 
     /**
+     * 快递订阅
+     * Author: zhouhongcheng
+     * datetime 2022/11/22 15:09
+     * @param string $express_company 物流公司名称
+     * @param string $express_number 物流编号
+     * @param string $callbackurl 异步请求地址
+     * @return bool
+     */
+    public function subscribeExpress(string $express_company, string $express_number, string $callbackurl): bool
+    {
+        $param = [
+            'company'    => $express_company,
+            'number'     => $express_number,
+            'key'        => $this->app_key,// 客户授权key
+            'parameters' => [
+                'callbackurl' => $callbackurl,//回调接口的地址，默认仅支持http，如需兼容https请联系快递100技术人员处理
+            ]
+        ];
+        $post_data = array();
+        $post_data["schema"] = 'json';
+        $post_data["param"] = json_encode($param);
+
+        foreach ($post_data as $k => $v) {
+            $params .= "$k=" . urlencode($v) . "&";     //默认UTF-8编码格式
+        }
+        $post_data = substr($params, 0, -1);
+
+        $header = ['Content-Type' => 'application/x-www-form-urlencoded'];
+        $res = json_decode(Common::curlPost($this->request_url, json_encode($post_data), $header), true);
+        if (!$res['result']) {
+            $exception_data = [
+                ['title' => '快递单号', 'remark' => $express_number],
+                ['title' => '异常信息', 'remark' => $res['message']]
+            ];
+            (new WechatRobot())->sendWechatRobotMsg($exception_data, '快递订阅异常');
+        }
+        return true;
+    }
+
+    /**
      * 查询物流信息
      * Author: lvg
      * datetime 2022/11/18 11:03
@@ -65,7 +105,7 @@ class Express
         }
         $data = substr($params, 0, -1);
         $header = ['Content-Type' => 'application/x-www-form-urlencoded'];
-        $res = json_decode(Common::curlPost($this->request_url, $data, $header), true);
+        $res = json_decode(Common::curlPost($this->request_url . '/query.do', $data, $header), true);
         if (empty($res['data']) || empty($res['state'])) {
             return ['res' => false, 'msg' => '物流信息查询失败', 'data' => []];
         }
