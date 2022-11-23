@@ -247,7 +247,7 @@ class Adapay
      * @param string $order_sn 清分订单号
      * @param string $confirm_amt 确认清分总金额 单位分
      * @param array $payment_company 清分企业[[ 'member_id' => '企业编号','amount'=>'清分金额(单位分)']]
-     * @param int $charge 手续费百分比:eg：6=6%
+     * @param int $charge 手续费千分比:eg：6=6%%
      * @param string $company_id 手续费收款企业
      * @param string $description 清分备注
      * @return array|void
@@ -267,7 +267,7 @@ class Adapay
 
         foreach ($payment_company as $key => $value) {
             $payment_company[$key]['fee_flag'] = 'N';
-            $payment_company[$key]['amount'] = bcmul($value['amount'], 0.01, 2);
+            $payment_company[$key]['amount'] = bcmul($value['amount'], 0.001, 2);
         }
         $payment = new PaymentConfirm();
         unset($this->ada_data['app_id']);
@@ -285,6 +285,7 @@ class Adapay
         $this->ada_data['div_members'] = [
             array_merge($charge_company, $payment_company)
         ];//分账对象信息列表，一次请求最多仅支持7个分账方
+        $payment->create($this->ada_data);
         if ($payment->isError()) {
             return ['res' => false, 'msg' => "调用清分异常：" . $payment->result['error_msg'] . "【" . $adapay_order_sn . "】"];
         }

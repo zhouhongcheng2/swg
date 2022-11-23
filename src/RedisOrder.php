@@ -5,8 +5,8 @@ namespace Swg\Composer;
 use RedisException;
 use Swg\Redis\Redis;
 
-require_once 'sdk/redis/Redis.php';
-// require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
+// require_once 'sdk/redis/Redis.php';
+require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 
 /** redis 订单库 */
 class RedisOrder extends Redis

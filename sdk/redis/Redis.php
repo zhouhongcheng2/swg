@@ -23,6 +23,12 @@ class Redis
     /** @var int 地址库 */
     const REDIS_AREA_DB = 5;
 
+    /** @var int 快递公司信息 */
+    const REDIS_EXPRESS_COMPANY_DB = 5;
+
+    /** @var int token库，存放各种token */
+    const REDIS_TOKEN_DB = 6;
+
     /**
      * @throws Exception
      */
@@ -56,9 +62,10 @@ class Redis
      */
     protected function getHSetData($key, $item_keys = null): ?array
     {
+        if (empty($key)) return [];
         if (is_null($item_keys)) {
             $json_array = $this->redis->hVals($key);
-            if (empty($json_array)) return null;
+            if (empty($json_array)) return [];
             return array_map(function ($val) {
                 return json_decode($val, true);
             }, $json_array);
@@ -67,12 +74,16 @@ class Redis
         if (!is_array($item_keys)) {
             $json = $this->redis->hGet($key, $item_keys);
             if (empty($json)) {
-                return null;
+                return [];
             }
             return json_decode($json, true);
         }
 
         $kv_arr = $this->redis->hMGet($key, $item_keys);
+        if (!is_array($kv_arr)) {
+            return [];
+        }
+
         foreach ($kv_arr as $key => &$val) {
             $val = json_decode($val, true);
         }
