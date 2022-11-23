@@ -26,6 +26,9 @@ class Redis
     /** @var int 快递公司信息 */
     const REDIS_EXPRESS_COMPANY_DB = 5;
 
+    /** @var int token库，存放各种token */
+    const REDIS_TOKEN_DB = 6;
+
     /**
      * @throws Exception
      */
