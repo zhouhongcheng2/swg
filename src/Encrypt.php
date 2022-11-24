@@ -41,11 +41,11 @@ class Encrypt
      * datetime 2022/11/2 19:52
      * @method
      * @route
-     * @param $password //用户传入的密码
+     * @param string $password 用户传入的密码
      * @param string $salt 盐
      * @return string
      */
-    public function createPassword($password, string $salt = ''): string
+    public function createPassword(string $password, string $salt = ''): string
     {
         return md5($salt . $password . $salt);
     }
