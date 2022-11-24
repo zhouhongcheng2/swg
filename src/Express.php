@@ -59,7 +59,7 @@ class Express
         $post_data = array();
         $post_data["schema"] = 'json';
         $post_data["param"] = json_encode($param);
-
+        $params = '';
         foreach ($post_data as $k => $v) {
             $params .= "$k=" . urlencode($v) . "&";     //默认UTF-8编码格式
         }
