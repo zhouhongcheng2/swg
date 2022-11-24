@@ -25,6 +25,8 @@ class RedisOrder extends Redis
     const REDIS_CUSTOMER_ORDER_REFUND_SUCCESS_KEY = 'customer_order_success';
     /** @var string 订单修改地址 */
     const REDIS_CUSTOMER_ORDER_UPDATE_ADDRESS_KEY = 'customer_order_update_address';
+    /** @var string 订单收货 */
+    const REDIS_CUSTOMER_ORDER_GET_PRODUCT_KEY = 'customer_order_get_product';
 
 
     public function __construct()
@@ -137,5 +139,19 @@ class RedisOrder extends Redis
     public function pushCustomerOrderUpdateAddress(array $data)
     {
         return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_UPDATE_ADDRESS_KEY, json_encode($data));
+    }
+
+
+    /**
+     * 订单收货同步B端   Redis
+     * Author: lvg
+     * datetime 2022/11/22 18:57
+     * @param array $data
+     * @return false|int|\Redis
+     * @throws RedisException
+     */
+    public function pushCustomerOrderGetProduct(array $data)
+    {
+        return $this->redis->lpush(self::REDIS_CUSTOMER_ORDER_GET_PRODUCT_KEY, json_encode($data));
     }
 }
