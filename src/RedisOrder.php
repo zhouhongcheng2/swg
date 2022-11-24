@@ -26,6 +26,10 @@ class RedisOrder extends Redis
     /** @var string 订单修改地址 */
     const REDIS_CUSTOMER_ORDER_UPDATE_ADDRESS_KEY = 'customer_order_update_address';
 
+    /** @var string 自动勾单 队列 */
+    const REDIS_AUTO_TICK_ORDER_LIST_KEY = 'auto_tick_order_list';
+    /** @var string 自动勾单加入队列的 最大快递完成时间 */
+    const REDIS_AUTO_TICK_ORDER_MAX_TIME = 'auto_tick_order_max_time';
 
     public function __construct()
     {
@@ -61,13 +65,46 @@ class RedisOrder extends Redis
     }
 
     /**
+     * 追加自动勾单子订单
+     * Author: zhouhongcheng
+     * datetime 2022/11/24 13:51
+     * @param string $son_order_sn 子订单号
+     * @return false|int
+     */
+    public function pushAutoTickOrder(string $son_order_sn)
+    {
+        return $this->redis->lpush(self::REDIS_AUTO_TICK_ORDER_LIST_KEY, $son_order_sn);
+    }
+
+    /**
+     * 设置 自动勾单 入队列的最后时间
+     * Author: zhouhongcheng
+     * datetime 2022/11/24 13:55
+     * @param array $data ['date'=>'当日时间戳','last_time'=>'当前时间戳']
+     * @return bool
+     */
+    public function setAutoTickLastTime(array $data): bool
+    {
+        return $this->redis->set(self::REDIS_AUTO_TICK_ORDER_MAX_TIME, json_encode($data));
+    }
+
+    /**
+     * 获取 自动勾单 入队列的最后时间
+     * Author: zhouhongcheng
+     * datetime 2022/11/24 14:01
+     * @return mixed
+     */
+    public function getAutoTickLastTime()
+    {
+        return json_decode($this->redis->get(self::REDIS_AUTO_TICK_ORDER_MAX_TIME), true);
+    }
+
+    /**
      * 追加C端订单
      * Author: zhouhongcheng
      * datetime 2022/11/11 13:49
-     * @method
-     * @route
      * @param string $order_sn 订单号
-     * @return int
+     * @return false|int
      */
     public function pushCustomerOrder(string $order_sn)
     {
@@ -78,8 +115,6 @@ class RedisOrder extends Redis
      * 取出并删除C端订单列表中最后一个元素
      * Author: zhouhongcheng
      * datetime 2022/11/11 14:21
-     * @method
-     * @route
      * @return bool|mixed
      */
     public function getCustomerOrder($key = self::REDIS_CUSTOMER_ORDER_KEY)
