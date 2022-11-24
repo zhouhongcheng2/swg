@@ -146,4 +146,16 @@ class Redis
     {
         return $this->redis->del($keys);
     }
+
+
+    protected static $static;
+
+    /**
+     * 获取单例对象
+     */
+    public static function getInstance()
+    {
+        if (empty(self::$static)) self::$static = new static();
+        return self::$static;
+    }
 }
