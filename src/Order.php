@@ -26,6 +26,9 @@ class Order
             case 'warehouse':
                 $str .= 'W';//仓库出入库
                 break;
+            case 'clear':
+                $str .= 'C';//清分
+                break;
             default:
                 $str .= 'T';//other
                 break;

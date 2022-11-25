@@ -22,7 +22,7 @@ class Adapay
 
     public function __construct()
     {
-        $this->app_id = 'app_d7954d45-b9dd-4fad-8174-e4baa9276df7';
+        $this->app_id = env('ADAPAY.APP_ID');
         # 加载SDK需要的文件
         include_once dirname(__FILE__) . "/../sdk/pay/adapay/AdapaySdk/init.php";
         # 加载商户的配置文件
@@ -143,7 +143,7 @@ class Adapay
         if ($account->isError()) {
             return ['res' => false, 'msg' => "创建个人结算账户对象错误：" . $account->result['error_msg'] . '【' . $ada_member_id . '】'];
         }
-        return ['res' => true, 'data' => []];
+        return ['res' => true, 'data' => $account->result];
     }
 
     /**
