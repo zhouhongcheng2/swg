@@ -83,19 +83,17 @@ class Express
      * datetime 2022/11/18 11:03
      * @param string $express_company 物流公司名称
      * @param string $express_number 物流编号
-     * @param mixed $mobile 收货人手机号
      * @return array
      */
-    public function getExpress(string $express_company, string $express_number, $mobile): array
+    public function getExpress(string $express_company, string $express_number): array
     {
         $data = [];
         //参数设置
         $data['key'] = $this->app_key;// 客户授权key
         $data['customer'] = $this->app_sign;// 查询公司编号
         $param = [
-            'com'   => $express_company,// 快递公司编码
-            'num'   => $express_number,// 快递单号
-            'phone' => $mobile,// 手机号
+            'com' => $express_company,// 快递公司编码
+            'num' => $express_number,// 快递单号
         ];
         $data['param'] = json_encode($param);
         $data['sign'] = strtoupper(md5($data['param'] . $data['key'] . $data['customer']));
@@ -105,7 +103,7 @@ class Express
         }
         $data = substr($params, 0, -1);
         $header = ['Content-Type' => 'application/x-www-form-urlencoded'];
-        $res = json_decode(Common::curlPost($this->request_url . '/query.do', $data, $header), true);
+        $res = json_decode(Common::curlPost($this->request_url, $data, $header), true);
         if (empty($res['data']) || empty($res['state'])) {
             return ['res' => false, 'msg' => '物流信息查询失败', 'data' => []];
         }
@@ -114,6 +112,7 @@ class Express
             'list'         => $res['data'],
             'order_status' => $order_status,// 订单状态，已经匹配了订单产品表的发货状态
             'receive_time' => $receive_time,// 收货时间，未收货是0
+            'state'        => $res['state'],
         ];
         return ['res' => true, 'msg' => 'Success', 'data' => $return_data];
     }
@@ -157,5 +156,46 @@ class Express
                 break;
         }
         return [$order_status, $receive_time];
+    }
+
+    /**
+     * 获取物流状态文字
+     * Author: lvg
+     * datetime 2022/11/25 15:24
+     * @param $state
+     * @return string
+     */
+    public function getStateTitle($state): string
+    {
+        switch ($state) {
+            case self::STATUS_ON_THE_WAY:
+                $title = '在途中';
+                break;
+            case self::STATUS_COLLECT:
+                $title = '揽收中';
+                break;
+            case self::STATUS_DIFFICULT:
+                $title = '疑难';
+                break;
+            case self::STATUS_MEMBER_GET:
+                $title = '已签收';
+                break;
+            case self::STATUS_WITHDRAWAL:
+                $title = '已退签';
+                break;
+            case self::STATUS_DISPATCH:
+                $title = '派件中';
+                break;
+            case self::STATUS_CUSTOMS:
+                $title = '清关';
+                break;
+            case self::STATUS_REFUSE_GET:
+                $title = '已拒签';
+                break;
+            default:
+                $title = '-';
+                break;
+        }
+        return $title;
     }
 }
