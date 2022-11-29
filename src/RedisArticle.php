@@ -4,10 +4,14 @@ namespace Swg\Composer;
 require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 
 use app\common\model\service\system\ArticleList;
+use RedisException;
 use Swg\Redis\Redis;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
+use think\db\exception\ModelNotFoundException;
 
 /** redis中国地址库 */
-class RedisArcitle extends Redis
+class RedisArticle extends Redis
 {
 
     const REDIS_KEY = 'article';
@@ -24,16 +28,16 @@ class RedisArcitle extends Redis
      * datetime 2022/11/14 17:47
      * @param string $title
      * @return bool
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException|RedisException
      */
-    public function setArticleByTitle(string $title)
+    public function setArticleByTitle(string $title): bool
     {
         $list = ArticleList::getListByTitleForRedis($title);
         $arr = [];
         foreach ($list as $value) {
-            $arr[$value['articleCate']['module'] . '_id_' . $value] = $this->encode($value->toArray());
+            $arr[$value['articleCate']['module'] . '_id_' . $value['id']] = $this->encode($value->toArray());
         }
         return $this->redis->hMSet(self::REDIS_KEY, $arr);
     }
@@ -46,7 +50,7 @@ class RedisArcitle extends Redis
      * @param mixed $module
      * @return array|null
      */
-    public function getArticle($id, $module)
+    public function getArticle($id, $module): ?array
     {
         return $this->getHSetData('article', $module . '_id_' . $id);
     }
