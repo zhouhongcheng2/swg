@@ -1,0 +1,3 @@
+1. 与接口对接人获得商户号, 商户公钥, 商户私钥
+2. 把ESTConfig.php里的商户号, 商户公钥, 商户私钥改成上述获得的信息
+3. 参考demo目录里的实例, 以及文档上的字段说明(https://ecp.sedsy.com/ecp/ecpfront/ecp/document.html#/doc/miniAppPay) 直接填充相应的数据即可 
