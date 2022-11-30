@@ -245,15 +245,15 @@ class Adapay
      * @route
      * @param string $adapay_order_sn Adapay生成的支付对象id
      * @param string $order_sn 清分订单号
-     * @param string $confirm_amt 确认清分总金额 单位分
-     * @param array $payment_company 清分企业[[ 'member_id' => '企业编号','amount'=>'清分金额(单位分)']]
-     * @param int $charge 手续费千分比:eg：6=6%%
+     * @param string $confirm_amt 确认清分总金额 单位元
+     * @param array $payment_company 清分企业[[ 'member_id' => '企业编号','amount'=>'清分金额(单位元)']]
+     * @param string $charge_money 手续费总额 单位元
      * @param string $company_id 手续费收款企业
      * @param string $description 清分备注
-     * @return array|void
+     * @return array
      */
-    public function createPaymentConfirm(string $adapay_order_sn, string $order_sn, string $confirm_amt, array $payment_company,
-                                         int    $charge = 6, string $company_id = '0', string $description = '')
+    public function createPaymentConfirm(string $adapay_order_sn, string $order_sn, string $confirm_amt, array $payment_company, string $charge_money,
+                                         string $company_id = '0', string $description = '')
     {
         if ($confirm_amt <= 0) {
             return ['res' => false, 'msg' => "清分金额异常"];
@@ -267,24 +267,22 @@ class Adapay
 
         foreach ($payment_company as $key => $value) {
             $payment_company[$key]['fee_flag'] = 'N';
-            $payment_company[$key]['amount'] = bcmul($value['amount'], 0.001, 2);
+            $payment_company[$key]['amount'] = bcadd($value['amount'], 0, 2);
         }
         $payment = new PaymentConfirm();
         unset($this->ada_data['app_id']);
-        $charge_money = bcmul($confirm_amt, bcdiv($charge, 10000), 2);//转为百分比 同时元转分
         //山王果技术支持企业，用户收取手续费
         $charge_company = [
             'member_id' => $company_id,//收款企业编号
-            'amount'    => $charge_money,//金额
+            'amount'    => bcadd($charge_money, 0, 2),//金额
             'fee_flag'  => 'Y',//承担交易所有手续费
         ];
         $this->ada_data['payment_id'] = $adapay_order_sn;//Adapay生成的支付对象id
         $this->ada_data['order_no'] = $order_sn;//请求订单号，只能为英文、数字或者下划线的一种或多种组合，保证在app_id下唯一
-        $this->ada_data['confirm_amt'] = $confirm_amt;//确认金额，必须大于0，保留两位小数点，如0.10、100.05等。必须小于等于原支付金额-已确认金额-已撤销金额。
+        $this->ada_data['confirm_amt'] = bcadd($confirm_amt, 0, 2);//确认金额，必须大于0，保留两位小数点，如0.10、100.05等。必须小于等于原支付金额-已确认金额-已撤销金额。
         $this->ada_data['description'] = $description;//附加说明
-        $this->ada_data['div_members'] = [
-            array_merge($charge_company, $payment_company)
-        ];//分账对象信息列表，一次请求最多仅支持7个分账方
+        $this->ada_data['div_members'] = array_merge([$charge_company], $payment_company);//分账对象信息列表，一次请求最多仅支持7个分账方
+
         $payment->create($this->ada_data);
         if ($payment->isError()) {
             return ['res' => false, 'msg' => "调用清分异常：" . $payment->result['error_msg'] . "【" . $adapay_order_sn . "】"];
