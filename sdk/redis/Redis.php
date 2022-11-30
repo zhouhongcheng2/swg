@@ -43,10 +43,25 @@ class Redis
         }
     }
 
+    protected static $instance = [];
+
+    /**
+     * 单例模式
+     * @return static
+     * @noinspection PhpMissingReturnTypeInspection
+     */
+    public static function getInstance()
+    {
+        if ((static::$instance[static::class] ?? null) instanceof static) {
+            return static::$instance[static::class];
+        }
+        return static::$instance[static::class] = new static();
+    }
+
     /**
      * 该接口是删除老数据重新添加
      */
-    protected function updateHSet($key, array $set_list): bool
+    protected function updateHSet($key, ?array $set_list): bool
     {
         $this->redis->del($key);
         return $this->redis->hMSet($key, $set_list);
@@ -119,7 +134,7 @@ class Redis
      * @param array $data
      * @return bool
      */
-    public function setData($key, array $data): bool
+    public function setData($key, ?array $data): bool
     {
         return $this->redis->set($key, $this->encode($data));
     }
@@ -145,17 +160,5 @@ class Redis
     public function delete($keys): int
     {
         return $this->redis->del($keys);
-    }
-
-
-    protected static $static;
-
-    /**
-     * 获取单例对象
-     */
-    public static function getInstance()
-    {
-        if (empty(self::$static)) self::$static = new static();
-        return self::$static;
     }
 }
