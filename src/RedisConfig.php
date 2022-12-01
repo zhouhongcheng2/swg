@@ -56,6 +56,16 @@ class RedisConfig extends Redis
      */
     public function getConfig(string $module, string $name)
     {
-        return $this->getData($module . '_' . $name);
+        $info = $this->getData($module . '_' . $name);
+        switch ($info['type']) {
+            case 'json':
+            case 'array':
+                $data = json_decode($info['value'], true);
+                break;
+            default:
+                $data = $info['value'];
+                break;
+        }
+        return $data;
     }
 }
