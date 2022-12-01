@@ -28,13 +28,13 @@ class SwgArray
 
         if ($level == 1) {
             foreach ($fields as $val) {
-                $new_data[$val] = empty($data[$val]) ? '' : $data[$val];
+                $new_data[$val] = !isset($data[$val]) || is_null($data[$val]) ? '' : $data[$val];
             }
             return $new_data;
         }
         foreach ($data as $key => $val) {
             foreach ($fields as $v) {
-                $new_data[$key][$v] = empty($val[$v]) ? '' : $val[$v];
+                $new_data[$key][$v] = !isset($data[$val]) || is_null($val[$v]) ? '' : $val[$v];
             }
         }
         return $new_data;
