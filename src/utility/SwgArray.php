@@ -34,7 +34,7 @@ class SwgArray
         }
         foreach ($data as $key => $val) {
             foreach ($fields as $v) {
-                $new_data[$key][$v] = !isset($data[$val]) || is_null($val[$v]) ? '' : $val[$v];
+                $new_data[$key][$v] = !isset($data[$v]) || is_null($val[$v]) ? '' : $val[$v];
             }
         }
         return $new_data;
