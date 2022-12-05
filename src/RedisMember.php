@@ -2,6 +2,7 @@
 
 namespace Swg\Composer;
 
+use Swg\Composer\utility\SwgArray;
 use Swg\Redis\Redis;
 
 // require_once 'sdk/redis/Redis.php';
@@ -66,8 +67,9 @@ class RedisMember extends Redis
      * @param $member_id
      * @return array|null
      */
-    public function getMemberInfo($member_id): ?array
+    public function getMemberInfo($member_id,$field='*'): ?array
     {
-        return $this->getData(self::REDIS_C_MEMBER_INFO_PREF . $member_id);
+        $info= $this->getData(self::REDIS_C_MEMBER_INFO_PREF . $member_id);
+        return SwgArray::getArrayByField($info,$field,1);
     }
 }
