@@ -6,11 +6,11 @@ namespace Swg\Composer;
 class Order
 {
     /** @var string 用户订单 */
-    const TYPE_ORDER = 'O';
+    const TYPE_ORDER = 'order';
     /** @var string 库存日志 */
-    const TYPE_WAREHOUSE = 'W';
+    const TYPE_WAREHOUSE = 'warehouse';
     /** @var string 清分 */
-    const TYPE_CLEAR = 'C';
+    const TYPE_CLEAR = 'clear';
     /** @var string 其他 */
     const TYPE_OTHER = 'T';
 
