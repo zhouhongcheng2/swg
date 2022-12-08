@@ -28,12 +28,14 @@ class SwgArray
 
         if ($level == 1) {
             foreach ($fields as $val) {
+                $val = trim($val);
                 $new_data[$val] = !isset($data[$val]) || is_null($data[$val]) ? '' : $data[$val];
             }
             return $new_data;
         }
         foreach ($data as $key => $val) {
             foreach ($fields as $v) {
+                $v = trim($v);
                 $new_data[$key][$v] = !isset($val[$v]) || is_null($val[$v]) ? '' : $val[$v];
             }
         }
