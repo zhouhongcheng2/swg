@@ -10,14 +10,9 @@ require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 /** redis配置库 */
 class RedisConfig extends Redis
 {
+    protected $db = self::REDIS_CONFIG_DB;
     /** @var string 服务端配置 redis前缀 */
     const REDIS_SERVICE_CONFIG_KEY = 'service';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis->select(self::REDIS_CONFIG_DB);
-    }
 
     /**
      * 设置配置

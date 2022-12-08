@@ -11,6 +11,8 @@ require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 /** redis 订单库 */
 class RedisOrder extends Redis
 {
+    protected $db = self::REDIS_ORDER_DB;
+
     /** @var string 退款原因 */
     const REDIS_ORDER_REFUND_OPTION_KEY = 'refund_option';
 
@@ -32,12 +34,6 @@ class RedisOrder extends Redis
     const REDIS_AUTO_TICK_ORDER_LIST_KEY = 'auto_tick_order_list';
     /** @var string 自动勾单加入队列的 最大快递完成时间 */
     const REDIS_AUTO_TICK_ORDER_MAX_TIME = 'auto_tick_order_max_time';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis->select(self::REDIS_ORDER_DB);
-    }
 
     /**
      * 设置退款原因选项

@@ -13,14 +13,8 @@ use think\db\exception\ModelNotFoundException;
 /** redis中国地址库 */
 class RedisArticle extends Redis
 {
-
+    protected $db = self::REDIS_CONFIG_DB;
     const REDIS_KEY = 'article';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis->select(self::REDIS_CONFIG_DB);
-    }
 
     /**
      * 设置文章redis
