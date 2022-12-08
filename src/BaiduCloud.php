@@ -62,8 +62,8 @@ class BaiduCloud
         $header = [
             'Content-Type:application/json',
         ];
-        $res = Common::curlPost($url, json_encode($data), $header,5,true);
-        if ($res['http_code']!=200){
+        $res = Common::curlPost($url, json_encode($data), $header, 5, true);
+        if ($res['http_code'] != 200) {
             throw new FatalErrorException("地址识别返回状态码(${$res['http_code']})");
         }
 
@@ -103,7 +103,7 @@ class BaiduCloud
         $town_code = $address_data['town_code'] ? str_pad($address_data['town_code'], 12, 0) : null;
         $province = empty($province_code) ? null : $this->redis_area->getProvince($province_code);
         if (!$province) {
-            return false;
+            return $data;
         }
         $data['province_id'] = $province['id'];
         $data['province'] = $province['name'];
