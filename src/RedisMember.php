@@ -11,15 +11,11 @@ require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 /** redis 用户库 */
 class RedisMember extends Redis
 {
+    protected $db = self::REDIS_MEMBER_DB;
+
     /** @var string 用户等级名称 */
     const REDIS_MEMBER_LEVEL_NAME_KEY = 'member_level_name';
     const REDIS_C_MEMBER_INFO_PREF = 'c_member_';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis->select(self::REDIS_MEMBER_DB);
-    }
 
     /**
      * 设置用户等级名称

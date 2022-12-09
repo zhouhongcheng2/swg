@@ -14,16 +14,12 @@ use Swg\Redis\Redis;
  */
 class RedisToken extends Redis
 {
+    protected $db = self::REDIS_TOKEN_DB;
+
     /** @var string token key前缀 */
     const TOKEN_PREF = 'token:';
     /** @var string 企业微信token前缀 */
     const TOKEN_WECHAT_QY = 'token:wx:qy:';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis->select(self::REDIS_TOKEN_DB);
-    }
 
     /**
      * 存储token

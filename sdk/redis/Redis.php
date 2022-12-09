@@ -7,6 +7,9 @@ use Swg\Composer\WechatRobot;
 
 class Redis
 {
+    /** @var mixed 所选数据库 */
+    protected $db;
+
     public $redis;
     /** @var int 商品库 */
     const REDIS_PRODUCT_DB = 1;
@@ -32,7 +35,7 @@ class Redis
     /**
      * @throws Exception
      */
-    public function __construct()
+    private function __construct()
     {
         require_once 'RedisConnect.php';
         $this->redis = RedisConnect::connectRedis();
@@ -41,6 +44,7 @@ class Redis
             $robot->sendWechatRobotMsg([["title" => "redis异常", "remark" => "redis链接异常请管理员及时核查"]], 'Redis链接异常');
             throw new Exception("Redis链接失败");
         }
+        $this->redis->select($this->db);
     }
 
     protected static $instance = [];
@@ -53,7 +57,9 @@ class Redis
     public static function getInstance()
     {
         if ((static::$instance[static::class] ?? null) instanceof static) {
-            return static::$instance[static::class];
+            $static = static::$instance[static::class];
+            $static->redis->select($static->db);
+            return $static;
         }
         return static::$instance[static::class] = new static();
     }

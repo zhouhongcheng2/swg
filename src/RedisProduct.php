@@ -10,6 +10,8 @@ require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 /** redis商品信息库 */
 class RedisProduct extends Redis
 {
+    protected $db = self::REDIS_PRODUCT_DB;
+
     /** @var string 商品列表key */
     const PRODUCT_LIST_KEY = 'product_list';
     const PRODUCT_ORIGIN = 'product_origin';
@@ -17,13 +19,6 @@ class RedisProduct extends Redis
 
     /** @var string 加盟商产品包 */
     const PRODUCT_JM_PACKAGE_KEY = 'jm_package_key';
-
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis->select(self::REDIS_PRODUCT_DB);
-    }
 
     /**
      * 设置产品包

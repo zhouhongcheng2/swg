@@ -8,6 +8,8 @@ use Swg\Redis\Redis;
 /** redis中国地址库 */
 class RedisArea extends Redis
 {
+    protected $db = self::REDIS_AREA_DB;
+
     /** @var string 省份 */
     const REDIS_PROVINCE_KEY = 'address_province';
     /** @var string 市前缀 下划线后拼接 省份id */
@@ -18,13 +20,6 @@ class RedisArea extends Redis
     const REDIS_ALL_PARENT_KEY = 'address_all_parent';
     /** @var string 街道键 下划线后拼接 县id */
     const REDIS_STREET_KEY_PREF = 'area_street_';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis->select(self::REDIS_AREA_DB);
-    }
-
 
     #=======【 省市县树形 】=====================================
 

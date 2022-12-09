@@ -10,15 +10,11 @@ require_once root_path() . 'vendor/swg/composer/sdk/redis/Redis.php';
 /** redis 快递公司信息 */
 class RedisExpress extends Redis
 {
+    protected $db = self::REDIS_EXPRESS_COMPANY_DB;
+
     /** @var string 快递公司key */
     const EXPRESS_COMPANY_LIST_ID = 'express_list_id';
     const EXPRESS_COMPANY_LIST_QDB = 'express_list_qdb';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis->select(self::REDIS_EXPRESS_COMPANY_DB);
-    }
 
     /**
      * 快递公司信息设置
