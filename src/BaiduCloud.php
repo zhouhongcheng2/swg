@@ -11,13 +11,11 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class BaiduCloud
 {
-    protected $redis_area = null;
     protected $access_token = null;
 
     public function __construct()
     {
         $this->getAccessToken();
-        $this->redis_area = new RedisArea();
     }
 
     /**
@@ -101,28 +99,28 @@ class BaiduCloud
         $city_code = $address_data['city_code'] ? str_pad($address_data['city_code'], 12, 0) : null;
         $county_code = $address_data['county_code'] ? str_pad($address_data['county_code'], 12, 0) : null;
         $town_code = $address_data['town_code'] ? str_pad($address_data['town_code'], 12, 0) : null;
-        $province = empty($province_code) ? null : $this->redis_area->getProvince($province_code);
+        $province = empty($province_code) ? null : RedisArea::getInstance()->getProvince($province_code);
         if (!$province) {
             return $data;
         }
         $data['province_id'] = $province['id'];
         $data['province'] = $province['name'];
 
-        $city = empty($city_code) ? null : $this->redis_area->getCityOfProvince($province['id'], $city_code);
+        $city = empty($city_code) ? null : RedisArea::getInstance()->getCityOfProvince($province['id'], $city_code);
         if (!$city) {
             return $data;
         }
         $data['city_id'] = $city['id'];
         $data['city'] = $city['name'];
 
-        $county = empty($county_code) ? null : $this->redis_area->getCountyOfCity($city['id'], $county_code);
+        $county = empty($county_code) ? null : RedisArea::getInstance()->getCountyOfCity($city['id'], $county_code);
         if (!$county) {
             return $data;
         }
         $data['county_id'] = $county['id'];
         $data['county'] = $county['name'];
 
-        $town = empty($town_code) ? null : $this->redis_area->getTownOfCounty($county['id'], $town_code);
+        $town = empty($town_code) ? null : RedisArea::getInstance()->getTownOfCounty($county['id'], $town_code);
         if (!$town) {
             return $data;
         }

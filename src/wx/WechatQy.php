@@ -19,14 +19,13 @@ class WechatQy
      */
     public static function getToken()
     {
-        $redis_token = new RedisToken();
-        $token = $redis_token->getQyWechatToken(env('QY_WECHAT.token_name'));
+        $token = RedisToken::getInstance()->getQyWechatToken(env('QY_WECHAT.token_name'));
         if ($token) return $token;
 
         $data = self::getQyWxAccessToken();
         $token = $data['access_token'];
         $ttl = bcsub($data['expires_in'], 200);//保证每一次的token都在有效期内 将有效期减 200 秒
-        $redis_token->setQyWechatToken(env('QY_WECHAT.token_name'), $token, $ttl);
+        RedisToken::getInstance()->setQyWechatToken(env('QY_WECHAT.token_name'), $token, $ttl);
         return $token;
     }
 

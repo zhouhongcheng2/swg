@@ -35,7 +35,7 @@ class Redis
     /**
      * @throws Exception
      */
-    public function __construct()
+    private function __construct()
     {
         require_once 'RedisConnect.php';
         $this->redis = RedisConnect::connectRedis();
