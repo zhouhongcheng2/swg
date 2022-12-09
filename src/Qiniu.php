@@ -57,14 +57,14 @@ class Qiniu
      * 获取七牛云水印连接
      * Author: lvg
      * datetime 2022/12/9 17:14
-     * @param string $url 图片地址
+     * @param string|null $url 图片地址
      * @param string $text 水印文字
      * @param int $font_size 文字大小
      * @param int $rotate 展示角度
      * @param array $density 密度 [width,height]
      * @return string
      */
-    public function getImageWatermarkUrl(string $url, string $text = '', int $font_size = 600, int $rotate = 155, array $density = [300, 300]): string
+    public function getImageWatermarkUrl(string $url = null, string $text = '', int $font_size = 600, int $rotate = 155, array $density = [300, 300]): string
     {
         return $url . '?watermark/4/text/' . base64_encode($text) . '/fontsize/' . $font_size . '/fill/Z3JheQ==/dissolve/50/rotate/' . $rotate . '/uw/' . $density[0] . '/uh/' . $density[1] . '/resize/1';
     }
