@@ -133,12 +133,12 @@ class RedisProduct extends Redis
         //更新商品赠品列表
         if ($product['is_reward']) {
             //更新赠品商品列表
-            $this->redis->zAdd(self::GIFT_LIST_KEY, $product['sort'], $id);
             $this->redis->zRem(self::PRODUCT_LIST_KEY, $id);
+            $this->redis->zAdd(self::GIFT_LIST_KEY, $product['sort'], $id);
         } else {
             //更新普通商品列表
-            $this->redis->zAdd(self::PRODUCT_LIST_KEY, $product['sort'], $id);
             $this->redis->zRem(self::GIFT_LIST_KEY, $id);
+            $this->redis->zAdd(self::PRODUCT_LIST_KEY, $product['sort'], $id);
         }
     }
 
