@@ -68,10 +68,10 @@ class RedisRequest extends Redis
      * 设置缓存
      * @param $request_key
      * @param int $member_id 当前登录用户ID
-     * @param array|null $data
+     * @param array|object|null $data
      * @param int $ttl 生命周期
      */
-    public function setCache($request_key, $params, int $member_id, ?array $data, int $ttl = 60)
+    public function setCache($request_key, $params, int $member_id, $data, int $ttl = 60)
     {
         $this->selectDb();
         $this->redis->set($this->getKey($request_key, $params, $member_id), $this->encode($data), ['ex' => $ttl]);
