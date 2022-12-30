@@ -66,6 +66,10 @@ class Qiniu
      */
     public function getImageWatermarkUrl(string $url = null, string $text = '', int $font_size = 600, int $rotate = 155, array $density = [300, 300]): string
     {
+        if (empty($url)) {
+            return '';
+        }
+        $url = explode('?', $url)[0];
         return $url . '?watermark/4/text/' . base64_encode($text) . '/fontsize/' . $font_size . '/fill/Z3JheQ==/dissolve/50/rotate/' . $rotate . '/uw/' . $density[0] . '/uh/' . $density[1] . '/resize/1';
     }
 }
