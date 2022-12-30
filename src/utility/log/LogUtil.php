@@ -17,7 +17,7 @@ class LogUtil  extends Log
      * 打印隐藏到日志[用在命令行程序，因为tp的命令行的异常不会被ExceptionHandler捕获]
      * Author: yyl
      * datetime 2022/12/22 11:31
-     * @param Exception $exception
+     * @param Exception|null $exception
      * @param string|null $title 异常标题
      * @return void
      */

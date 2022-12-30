@@ -27,6 +27,7 @@ class RedisRequest extends Redis
     /**
      * 获取或设置截止今日缓存
      * @param $request_key
+     * @param $params
      * @param int $member_id 当前登录用户ID
      * @param callable|null $callable
      * @return mixed|null
@@ -40,6 +41,7 @@ class RedisRequest extends Redis
     /**
      * 获取缓存
      * @param $request_key
+     * @param $params
      * @param int $member_id 当前登录用户ID
      * @param callable|null $callable 数据击穿回调，该回调查询数据并返回
      * @param int $ttl
@@ -67,6 +69,7 @@ class RedisRequest extends Redis
     /**
      * 设置缓存
      * @param $request_key
+     * @param $params
      * @param int $member_id 当前登录用户ID
      * @param array|object|null $data
      * @param int $ttl 生命周期
@@ -100,9 +103,9 @@ class RedisRequest extends Redis
 
     /**
      * 是否启用请求缓存
-     * @return void
+     * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return env('REDIS.ENABLE_REQUEST_CACHE') == true;
     }
