@@ -31,6 +31,9 @@ class Redis
 
     /** @var int token库，存放各种token */
     const REDIS_TOKEN_DB = 6;
+    
+    /** @var int 请求接口缓存 */
+    const REDIS_REQUEST_CACHE_DB = 8;
 
     /**
      * @throws Exception
@@ -167,4 +170,25 @@ class Redis
     {
         return $this->redis->del($keys);
     }
+
+    /**
+     * 批量删除keys
+     * @param mixed $pattern 匹配模式
+     * @return int
+     */
+    public function deleteList($pattern): int
+    {
+        $keys = $this->redis->keys($pattern);
+        return $this->delete($keys);
+    }
+
+    /**
+     * 选择当前库
+     */
+    public function selectDb()
+    {
+        $this->redis->select($this->db);
+    }
+
+
 }

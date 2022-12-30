@@ -18,7 +18,7 @@ class Common
      * @param bool $getCode
      * @return array|bool|string
      */
-    public static function curlPost(string $url, $data, array $aHeader = array(), int $timeout = 10, bool $getCode = false)
+    public static function curlPost(string $url, $data, array $aHeader = array(), int $timeout = 10, bool $getCode = false,&$error_msg=null)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -33,6 +33,11 @@ class Common
         // 把post的变量加上
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         $output = curl_exec($ch);
+        
+        if (empty($output) && !is_null($error_msg)) {
+            $error_msg = curl_error($ch);
+        }
+        
         if ($getCode) {
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
@@ -52,7 +57,7 @@ class Common
      * @param bool $getCode
      * @return array|bool|string
      */
-    public static function curlGet(string $url, int $timeout = 10, bool $getCode = false)
+    public static function curlGet(string $url, int $timeout = 10, bool $getCode = false,&$error_msg=null)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -67,6 +72,10 @@ class Common
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
             return array('http_code' => $httpCode, 'data' => $file_contents);
+        }
+
+        if (empty($output) && !is_null($error_msg)) {
+            $error_msg = curl_error($ch);
         }
 
         curl_close($ch);
