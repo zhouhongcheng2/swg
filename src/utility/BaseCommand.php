@@ -35,7 +35,7 @@ abstract class BaseCommand extends Command
             LogUtil::exception($info);//详情日志写到runtime/command/xxx.log统一管理，避免日志文件过大
             $this->error($info->getMessage());
         } else {
-            $this->info($info . " 具体信息请查看runtime/command/xxx.log", 'error❎');
+            $this->info($info . " 具体信息请查看runtime/command/xxx.log", 'error⚠️');
         }
     }
 }

@@ -43,4 +43,21 @@ class LogUtil  extends Log
         $static = $static->channel('command');
         return call_user_func_array([$static, $method], $params);
     }
+
+    /**
+     * echo 日志
+     */
+    public static function echoLog($log)
+    {
+        echo '['.date('H:m:s m-d-Y',time()).'] ' ,$log, PHP_EOL;
+    }
+
+    /**
+     * echo 日志并exit
+     */
+    public static function echoAbortLog($log)
+    {
+        self::echoLog($log);
+        exit();
+    }
 }
