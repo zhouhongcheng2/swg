@@ -71,7 +71,7 @@ class RedisRequest extends Redis
      * @param $request_key
      * @param $params
      * @param int $member_id 当前登录用户ID
-     * @param array|object|null $data
+     * @param array|object|mixed $data
      * @param int $ttl 生命周期
      */
     public function setCache($request_key, $params, int $member_id, $data, int $ttl = 60)
