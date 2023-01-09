@@ -34,6 +34,9 @@ class Redis
     
     /** @var int 请求接口缓存 */
     const REDIS_REQUEST_CACHE_DB = 8;
+    
+    /** @var int 工厂相关 */
+    const REDIS_FACTORY = 9;
 
     /**
      * @throws Exception
@@ -41,13 +44,14 @@ class Redis
     private function __construct()
     {
         require_once 'RedisConnect.php';
-        $this->redis = RedisConnect::connectRedis();
-        if ($this->redis == false) {
+        try {
+            $this->redis = RedisConnect::connectRedis();
+        } catch (Exception $exception) {
             $robot = new WechatRobot();
-            $robot->sendWechatRobotMsg([["title" => "redis异常", "remark" => "redis链接异常请管理员及时核查"]], 'Redis链接异常');
-            throw new Exception("Redis链接失败");
+            $robot->sendWechatRobotMsg([["title" => "redis异常", "remark" => $exception->getMessage()]], 'Redis链接异常');
+            throw $exception;
         }
-        $this->redis->select($this->db);
+        $this->selectDb();
     }
 
     protected static $instance = [];

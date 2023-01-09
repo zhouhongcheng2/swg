@@ -18,24 +18,20 @@ final class RedisConnect
      * datetime 2022/11/4 16:35
      * @method
      * @route
-     * @return false|\Redis
+     * @return \Redis
      */
     public static function connectRedis()
     {
-        try {
-            if (!self::$instance instanceof \Redis) {
-                // $host = env('REDIS.HOST','r-bp1sro7jzd202d40onpd.redis.rds.aliyuncs.com');
-                $host = 'r-bp1sro7jzd202d40onpd.redis.rds.aliyuncs.com';
-                $port = 6379;
-                $timeout = 20;
-                $redis = new \Redis();
-                $redis->connect($host, $port, $timeout);
-                // $redis->auth(env('REDIS.PASSWORD', 'csNE5u4k8XYX2'));
-                $redis->auth('csNE5u4k8XYX2');
-                self::$instance = $redis;
-            }
-        } catch (\RedisException $e) {
-            return false;
+        if (!self::$instance instanceof \Redis) {
+            $host = env('REDIS.HOST', 'r-bp1sro7jzd202d40onpd.redis.rds.aliyuncs.com');
+            // $host = 'r-bp1sro7jzd202d40onpd.redis.rds.aliyuncs.com';
+            $port = 6379;
+            $timeout = 20;
+            $redis = new \Redis();
+            $redis->connect($host, $port, $timeout);
+            $redis->auth(env('REDIS.PASSWORD', 'csNE5u4k8XYX2'));
+            // $redis->auth('csNE5u4k8XYX2');
+            self::$instance = $redis;
         }
         return self::$instance;
     }
