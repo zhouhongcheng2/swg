@@ -2,6 +2,7 @@
 
 namespace Swg\Composer;
 
+use Exception;
 use Swg\Redis\Redis;
 
 // require_once 'sdk/redis/Redis.php';
@@ -135,11 +136,39 @@ class RedisProduct extends Redis
             //更新赠品商品列表
             $this->redis->zRem(self::GIFT_LIST_KEY, $id);
             $this->redis->zAdd(self::GIFT_LIST_KEY, $product['sort'], $id);
-        } 
+        }
         
         //更新普通商品列表
         $this->redis->zRem(self::PRODUCT_LIST_KEY, $id);
         $this->redis->zAdd(self::PRODUCT_LIST_KEY, $product['sort'], $id);
+    }
+
+    /**
+     * 退款时，更新库存和销售量
+     * 修改该方法需要注意 updateStockOnSale()方法的调用关系
+     * Author: yyl
+     * datetime 2023/1/9 14:14
+     * @return void
+     * @throws Exception
+     */
+    public function updateStockOnRefund(int $product_id, int $num)
+    {
+        $product_info = self::getInstance()->getProductById($product_id);
+        if (empty($product_info)) {
+            throw new Exception("更新库存和销售量, 找不到商品[product_id=$product_id]");
+        }
+        $product_info['product_stock'] += $num;
+        $product_info['real_sales'] -= $num;
+        self::getInstance()->updateProduct($product_info);
+    }
+
+    /**
+     * 销售时，更新库存和销量
+     * @throws Exception
+     */
+    public function updateStockOnSale(int $product_id,int $num)
+    {
+        $this->updateStockOnRefund($product_id,-$num);
     }
 
     /**
