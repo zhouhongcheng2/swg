@@ -104,7 +104,7 @@ class Express
         $data = substr($params, 0, -1);
         $header = ['Content-Type' => 'application/x-www-form-urlencoded'];
         $res = json_decode(Common::curlPost($this->request_url, $data, $header), true);
-        if (empty($res['data']) || empty($res['state'])) {
+        if (empty($res['data']) || !isset($res['state'])) {
             return ['res' => false, 'msg' => '物流信息查询失败', 'data' => []];
         }
         list($order_status, $receive_time) = self::getOrderStatusByExpressState($res['state'], $res['data'][0]);
