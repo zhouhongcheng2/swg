@@ -155,7 +155,7 @@ class TransUtil
      */
     public static function timeToDate(?int $time, string $format = 'Y-m-d H:i:s')
     {
-        if (empty($time)) return $time;
+        if (empty($time)) return '';
         return date($format, $time);
     }
 
